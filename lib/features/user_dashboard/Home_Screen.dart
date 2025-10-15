@@ -8,7 +8,7 @@ class NavBar extends StatefulWidget {
   const NavBar({super.key});
 
   @override
-  State<NavBar> createState() => _NavBarState();
+  State<NavBar> gcreateState() => _NavBarState();
 }
 
 class _NavBarState extends State<NavBar> {
