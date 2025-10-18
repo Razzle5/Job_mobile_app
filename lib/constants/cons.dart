@@ -1,0 +1,1 @@
+//untuk data constan
