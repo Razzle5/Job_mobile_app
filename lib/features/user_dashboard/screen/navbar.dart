@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:job_app/features/user_dashboard/controllers/navigation_controllers.dart';
 
 class NavigationMenu extends StatelessWidget {
   const NavigationMenu({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(NavigationController());
+    final controller = Get.find<NavigationControllers>();
 
     return Scaffold(
+      //bottom navigation bar showed
         bottomNavigationBar: Obx(
           () =>  NavigationBar(
               height: 80,
@@ -25,13 +27,9 @@ class NavigationMenu extends StatelessWidget {
               ],
           ),
         ),
-        body: Obx(() => controller.screen[controller.selectedIndex.value]),
+        //showed screen based on choice
+        body: Obx(() => controller.screens[controller.selectedIndex.value]),
     );
   }
 }
 
-class NavigationController extends GetxController{
-    final Rx<int> selectedIndex = 0.obs;
-
-    final screen = [Container(color:Colors.green),Container(color:Colors.yellow),Container(color:Colors.blue)];
-}

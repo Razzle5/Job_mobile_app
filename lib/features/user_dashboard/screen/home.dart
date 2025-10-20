@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:job_app/common/styles/widget/custom_shapes/curved_edges/curved_edges.dart';
 import 'package:job_app/constants/colors.dart';
+import 'package:job_app/common/styles/widget/custom_shapes/container/circular_container.dart';
+import 'package:job_app/common/styles/widget/custom_shapes/curved_edges/curved_edges_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -7,43 +10,43 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              color: CColors.primary,
-              padding: const EdgeInsets.all(0),
-              child: Stack(
-                children: [
-                  CCircularContainer(),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
+      body: CPrimaryHeaderContainer(child:Column(
+        children: [
+
+        ],
+      ),),
     );
   }
 }
 
-class CCircularContainer extends StatelessWidget {
-  const CCircularContainer({
-    super.key,
+class CPrimaryHeaderContainer extends StatelessWidget {
+  const CPrimaryHeaderContainer({
+    super.key, required this.child,
   });
 
-
-  
-
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 400,
-      height: 400,
-      padding: const EdgeInsets.all(0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(400),
-        color: CColors.textWhite.withOpacity(0.1),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          CCurvedEdgeWidget(
+            child: Container(
+              color: CColors.primary,
+              padding: const EdgeInsets.all(0),
+              child: SizedBox(
+                height: 300.0,
+                child: Stack(
+                  children: [
+                    Positioned(top:-150, right: -250 , child: CCircularContainer(backgroundcolor : CColors.textWhite.withAlpha(25))),
+                    Positioned(top: 100, right: -300,  child: CCircularContainer(backgroundcolor : CColors.textWhite.withAlpha(25))),
+                  ],
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }

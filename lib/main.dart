@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:job_app/features/user_dashboard/screen/navbar.dart';
-
+import 'package:job_app/features/user_dashboard/screen/home.dart';
+import 'package:job_app/features/user_dashboard/controllers/navigation_controllers.dart';
+import 'package:get/get.dart';
 
 void main() {
+  Get.put(NavigationControllers());
   runApp(const MyApp());
 }
 
@@ -18,7 +21,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      home: const NavigationMenu(),
+      home: NavigationMenu(),
     );
   }
 }
