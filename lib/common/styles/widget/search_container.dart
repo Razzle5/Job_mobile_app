@@ -8,7 +8,7 @@ class TSearchContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 65.0),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -20,7 +20,15 @@ class TSearchContainer extends StatelessWidget {
             children: [
               Icon(Iconsax.search_normal, color: CColors.textWhite),
               SizedBox(width: 12),
-              Text("Cari Tipe Kerja", style: TextStyle(color: CColors.textWhite)),
+              Expanded(child: 
+              TextField(
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  labelText: "Cari Tipe Kerja", 
+                  labelStyle: TextStyle(color: CColors.textWhite),
+                  ),
+              ),
+             ),
             ],
           )
       ),

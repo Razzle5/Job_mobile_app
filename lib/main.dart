@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:job_app/features/user_dashboard/screen/navbar.dart';
-import 'package:job_app/features/user_dashboard/screen/home.dart';
 import 'package:job_app/features/user_dashboard/controllers/navigation_controllers.dart';
 import 'package:get/get.dart';
 
