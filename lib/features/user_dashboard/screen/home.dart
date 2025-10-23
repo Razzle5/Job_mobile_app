@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:job_app/common/styles/widget/search_container.dart';
 import 'package:job_app/common/styles/widget/custom_shapes/container/primary_header_container.dart';
+import 'package:job_app/common/styles/widget/job__card.dart';
 // KODE MODIFIKASI HomeScreen
 
 class HomeScreen extends StatelessWidget {
@@ -18,15 +19,14 @@ class HomeScreen extends StatelessWidget {
               onTap: unfocusKeyboard,
 
               child: SingleChildScrollView( 
-                  child: Column( // Column adalah penyusun utama konten
+                  child: Column( 
                       children: [
                           // A. HEADER AREA (Warna Biru, Bentuk Melengkung)
                           CPrimaryHeaderContainer(
-                              // Child dari Header Container adalah konten yang ditampilkan DI ATAS header
                               child: Column(
                                   children: [
                                       // TAppBar(), // <-- Nanti untuk user profile
-                                      TSearchContainer(), // <-- Search bar Anda sekarang terlihat
+                                      TSearchContainer(), 
                                   ],
                               ),
                           ),
@@ -40,7 +40,9 @@ class HomeScreen extends StatelessWidget {
                                   padding: EdgeInsets.all(24.0),
                                   child: Column(
                                       children: [
-                                          // ... Konten Home Screen lainnya (List Pekerjaan, dll.)
+                                        Text("Job Recommendation", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                                SizedBox(height: 16),
+                                                TJobCard(), // <-- Card Pekerjaan Pertama
                                       ],
                                   ),
                               ),
