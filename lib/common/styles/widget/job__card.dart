@@ -1,12 +1,13 @@
 // lib/common/widgets/job_card.dart
 
 import 'package:flutter/material.dart';
-import 'package:job_app/constants/colors.dart'; // Asumsikan warna Anda
-import 'package:iconsax_flutter/iconsax_flutter.dart'; // Untuk ikon (misal bookmark)
+import 'package:job_app/constants/colors.dart'; 
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:job_app/data/models/job_model.dart';
 
 class TJobCard extends StatelessWidget {
-  // Nanti akan menerima JobModel, untuk saat ini kita buat statis dulu
-  const TJobCard({super.key});
+  final JobModel jobModel;
+  const TJobCard({super.key,required this.jobModel});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,7 @@ class TJobCard extends StatelessWidget {
         boxShadow: [
           // Tambahkan shadow agar terlihat timbul (opsional)
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withAlpha(25),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 3), 
@@ -32,17 +33,13 @@ class TJobCard extends StatelessWidget {
           // 1. BARIS ATAS: Logo, Judul Pekerjaan, Tombol Bookmark
           Row(
             children: [
-              // Logo Perusahaan (Ganti dengan Image.asset atau NetworkImage)
-              const Icon(Iconsax.facebook, size: 40, color: Colors.blue), 
-              const SizedBox(width: 12),
-              
               // Judul & Perusahaan
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Ui/Ux Designer", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    Text("Facebook", style: TextStyle(color: Colors.grey, fontSize: 14)),
+                    Text(jobModel.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(jobModel.companyName, style: TextStyle(color: Colors.grey, fontSize: 14)),
                   ],
                 ),
               ),
@@ -55,14 +52,14 @@ class TJobCard extends StatelessWidget {
           const SizedBox(height: 12),
 
           // 2. BARIS BAWAH: Lokasi & Gaji
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Lokasi/Tipe Kerja
-              Text("United State - Full Time", style: TextStyle(color: Colors.grey)), 
+              Text(jobModel.location, style: TextStyle(color: Colors.grey)), 
 
               // Gaji
-              Text("\$ 2.500", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)), 
+              Text(jobModel.salary, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)), 
             ],
           ),
         ],
