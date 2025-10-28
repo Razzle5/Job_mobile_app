@@ -1,2 +1,1 @@
-//Activity Screen 
-
+//Activity Screen

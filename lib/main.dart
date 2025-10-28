@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:job_app/features/user_dashboard/screen/navbar.dart';
 import 'package:job_app/features/user_dashboard/controllers/navigation_controllers.dart';
 import 'package:get/get.dart';
+import 'package:job_app/features/authentications/screen/form.dart';
 
 void main() {
   Get.put(NavigationControllers());
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      home: NavigationMenu(),
+      home: JobSeekerDataCollection(),
     );
   }
 }
