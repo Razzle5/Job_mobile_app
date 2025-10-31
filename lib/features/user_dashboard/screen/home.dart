@@ -4,10 +4,6 @@ import 'package:job_app/common/styles/widget/custom_shapes/container/primary_hea
 import 'package:job_app/common/styles/widget/job__card.dart';
 import 'package:job_app/data/models/job_model.dart';
 import 'package:job_app/data/repositories/job_repository.dart';
-import 'package:job_app/data/repositories/job_repository.dart';
-import 'package:job_app/data/models/job_model.dart';
-
-// KODE MODIFIKASI HomeScreen
 
 class HomeScreen extends StatefulWidget {
     const HomeScreen({super.key});

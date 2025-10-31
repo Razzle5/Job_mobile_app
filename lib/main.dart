@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:job_app/features/user_dashboard/screen/navbar.dart';
 import 'package:job_app/features/user_dashboard/controllers/navigation_controllers.dart';
 import 'package:get/get.dart';
-import 'package:job_app/features/authentications/screen/form.dart';
+import 'package:job_app/features/user_dashboard/screen/jobseeker_form_screen.dart';
 
 void main() {
   Get.put(NavigationControllers());
