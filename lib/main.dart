@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:job_app/features/authentications/screen/hrd_signup_screen.dart';
+import 'package:job_app/features/authentications/screen/hrd_registration_screen.dart';
 import 'package:job_app/features/user_dashboard/controllers/navigation_controllers.dart';
 import 'package:get/get.dart';
+import 'package:job_app/features/authentications/screen/hrd_registration_screen.dart';
 import 'package:job_app/features/user_dashboard/screen/jobseeker_form_screen.dart';
 
 void main() {
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      home: SignUpScreen(),
+      home: HrdRegistrationScreen(),
     );
   }
 }

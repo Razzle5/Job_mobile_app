@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:job_app/data/repositories/auth_repository_hrd.dart';
-import 'package:google_sign_in/google_sign_in.dart' ;
+import 'package:google_sign_in/google_sign_in.dart';
 
 //enum buat bedain otentikasi (email&password/google)
 enum AuthMethod {emailPassword,google}
@@ -10,8 +10,10 @@ class HrdSignupController extends GetxController{
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
     final TextEditingController email = TextEditingController();
     final TextEditingController password = TextEditingController();
-    final GoogleSignIn _googleSignIn = const GoogleSignIn(scopes: ['email']);
-  
+    late String confirmPassword;
+    final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+
+
   RxBool isLoading = false.obs;
   final AuthRepository _repository = AuthRepository();
 
@@ -22,6 +24,7 @@ class HrdSignupController extends GetxController{
     password.dispose();
     super.onClose();
   }
+
 
   //Buat Arahin alur Otentikasi
   
@@ -50,6 +53,10 @@ class HrdSignupController extends GetxController{
 
   Future<void> _registerWithEmailPassword() async {
     final result = await _repository.registerHrd(email.text, password.text);
+
+    if (password.text != confirmPassword){
+      Get.snackbar('Gagal', 'Konfirmasi Password tidak cocok',backgroundColor: Colors.red,colorText: Colors.white);
+    }
 
     if (result['success']) {
       final userId = result['data']['user_id'];

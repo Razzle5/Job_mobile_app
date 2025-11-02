@@ -1,133 +1,97 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; 
 import 'package:job_app/common/styles/components.dart';
 import 'package:job_app/constants/colors.dart';
-import 'package:job_app/features/hrd_dashboard/screen/welcome.dart';
 import 'package:loading_overlay/loading_overlay.dart';
-import 'package:job_app/features/hrd_dashboard/screen/home_screen_hrd.dart';
+// Note: HrdRegistrationScreen.id is used for navigating back from HrdLoginScreen
+import '../controllers/hrd_login_controller.dart'; 
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-  static String id = 'login_screen';
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final _auth = FirebaseAuth.instance;
-  late String _email;
-  late String _password;
-  bool _saving = false;
+class HrdLoginScreen extends StatelessWidget { 
+  const HrdLoginScreen({super.key});
+  static String id = 'hrd_login_screen'; 
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(HrdLoginController());
+
     return WillPopScope(
       onWillPop: () async {
-        Navigator.popAndPushNamed(context, HomeScreen.id);
-        return false;
+        Navigator.pop(context); 
+        return true;
       },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: LoadingOverlay(
-          isLoading: _saving,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  const TopScreenImage(screenImageName: 'welcome.png'),
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const ScreenTitle(title: 'Login'),
-                        CustomTextField(
-                          textField: TextField(
-                              onChanged: (value) {
-                                _email = value;
-                              },
-                              style: const TextStyle(
-                                fontSize: 20,
+      child: Obx(
+        () => Scaffold(
+          backgroundColor: Colors.white,
+          body: LoadingOverlay(
+            isLoading: controller.isLoading.value,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Form( 
+                  key: controller.formKey, 
+                  child: Column(
+                    children: [
+                      const TopScreenImage(screenImageName: 'welcome.png'),
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const ScreenTitle(title: 'HRD Login'),
+                            
+                            // 3. TEXT FIELD EMAIL
+                            CustomTextField(
+                              textField: TextField( // Menggunakan TextField sesuai template
+                                controller: controller.email, 
+                                keyboardType: TextInputType.emailAddress,
+                                style: const TextStyle(fontSize: 20),
+                                decoration: CColors.kTextInputDecoration.copyWith(
+                                    hintText: 'Email'),
                               ),
-                              decoration: CColors.kTextInputDecoration.copyWith(
-                                  hintText: 'Email')),
-                        ),
-                        CustomTextField(
-                          textField: TextField(
-                            obscureText: true,
-                            onChanged: (value) {
-                              _password = value;
-                            },
-                            style: const TextStyle(
-                              fontSize: 20,
                             ),
-                            decoration: CColors.kTextInputDecoration.copyWith(
-                                hintText: 'Password'),
-                          ),
-                        ),
-                        CustomBottomScreen(
-                          textButton: 'Login',
-                          heroTag: 'login_btn',
-                          question: 'Forgot password?',
-                          buttonPressed: () async {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            setState(() {
-                              _saving = true;
-                            });
-                            try {
-                              await _auth.signInWithEmailAndPassword(
-                                  email: _email, password: _password);
-
-                              if (context.mounted) {
-                                setState(() {
-                                  _saving = false;
-                                  Navigator.popAndPushNamed(
-                                      context, LoginScreen.id);
-                                });
-                                Navigator.pushNamed(context, WelcomeScreen.id);
-                              }
-                            } catch (e) {
-                              signUpAlert(
-                                context: context,
-                                onPressed: () {
-                                  setState(() {
-                                    _saving = false;
-                                  });
-                                  Navigator.popAndPushNamed(
-                                      context, LoginScreen.id);
-                                },
-                                title: 'WRONG PASSWORD OR EMAIL',
-                                desc:
-                                    'Confirm your email and password and try again',
-                                btnText: 'Try Now',
-                              ).show();
-                            }
-                          },
-                          questionPressed: () {
-                            signUpAlert(
-                              onPressed: () async {
-                                await FirebaseAuth.instance
-                                    .sendPasswordResetEmail(email: _email);
+                            
+                            // 4. TEXT FIELD PASSWORD
+                            CustomTextField(
+                              textField: TextField(
+                                controller: controller.password,
+                                obscureText: true,
+                                style: const TextStyle(fontSize: 20),
+                                decoration: CColors.kTextInputDecoration.copyWith(
+                                    hintText: 'Password'),
+                              ),
+                            ), // <--- PENUTUP CustomTextField
+                            
+                            // 5. BUTTON LOGIN
+                            CustomBottomScreen(
+                              textButton: 'Login',
+                              heroTag: 'login_btn',
+                              question: 'Forgot password?',
+                              buttonPressed: () async {
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                controller.loginHrd(); 
                               },
-                              title: 'RESET YOUR PASSWORD',
-                              desc:
-                                  'Click on the button to reset your password',
-                              btnText: 'Reset Now',
-                              context: context,
-                            ).show();
-                          },
+                              questionPressed: () {
+                                Get.snackbar('Fitur', 'Reset Password belum diimplementasikan.'); 
+                              },
+                            ), // <--- PENUTUP CustomBottomScreen
+                            
+                            // 6. OPSIONAL: Tombol Login Google
+                            ElevatedButton(
+                              onPressed: controller.loginGoogle,
+                              child: const Text('Login with Google'),
+                            ) 
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
         ),
       ),
-    );
+    ); 
   }
 }

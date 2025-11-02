@@ -19,6 +19,7 @@ class AuthRepository {
         'password': password,
       }),
     );
+    
 
     // Mengembalikan respons untuk diproses oleh Controller
     final responseBody = jsonDecode(response.body);
@@ -50,6 +51,29 @@ class AuthRepository {
       return {'success': true, 'data': responseBody};
     } else {
       return {'success': false, 'message': responseBody['message'] ?? 'Authentication failed'};
+    }
+  }
+    Future<Map<String, dynamic>> loginHrd(String email, String password) async {
+    final url = Uri.parse('$_baseUrl/hrd/login'); // <-- Endpoint Login
+
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': email,
+        'password': password,
+      }),
+    );
+
+    final responseBody = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      return {'success': true, 'data': responseBody};
+    } else {
+      // 401 Unauthorized atau 422 Validasi
+      return {'success': false, 'message': responseBody['message'] ?? 'Login gagal'};
     }
   }
 }

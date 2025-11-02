@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:job_app/common/styles/components.dart';
 import 'package:job_app/features/authentications/screen/hrd_login_screen.dart';
-import 'package:job_app/features/authentications/screen/hrd_signup_screen.dart';
+import 'package:job_app/features/authentications/screen/hrd_registration_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
