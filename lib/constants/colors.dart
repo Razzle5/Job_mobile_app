@@ -39,4 +39,13 @@ class CColors {
   static const Color warning = Color(0xFFFF57C00);
   static const Color info = Color(0xFF1976D2);
 
+  
+  static const Color kBackgroundColor = Color(0xFFD4DEF7);
+  static const Color kTextColor = Color(0xFF4879C5);
+  static const InputDecoration kTextInputDecoration = InputDecoration(
+  border: InputBorder.none,
+  hintText: '',
+  // ),
+);
+
 }
