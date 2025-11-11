@@ -1,117 +1,157 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; // Wajib: Import GetX
-import 'package:job_app/common/styles/components.dart'; // Asumsi komponen Alert
-import 'package:job_app/constants/colors.dart';
-import 'package:loading_overlay/loading_overlay.dart'; // Untuk Loading
-import 'package:job_app/features/authentications/controllers/hrd_signup_controller.dart';
-import 'package:job_app/features/authentications/screen/hrd_login_screen.dart';
+import 'package:get/get.dart';
+import 'package:loading_overlay/loading_overlay.dart';
+import 'package:job_app/data/repositories/auth_repository_hrd.dart';
+import '../controllers/hrd_signup_controller.dart';
+import 'hrd_login_screen.dart';
 
+// Pastikan Enum ini ada di Controller Anda
+enum AuthMethod { emailPassword, google }
 
-class HrdRegistrationScreen extends StatelessWidget { 
+class HrdRegistrationScreen extends StatelessWidget {
   const HrdRegistrationScreen({super.key});
-  static String id = 'hrd_registration_screen'; // ID screen
+  static String id = 'hrd_registration_screen';
 
   @override
   Widget build(BuildContext context) {
-    // 1. Inisialisasi/Akses Controller GetX
+    // 1. Akses Controller
     final controller = Get.put(HrdSignupController());
 
-    return WillPopScope(
-      onWillPop: () async {
-        // Asumsi ini navigasi kembali ke Home atau Login
-        Navigator.pop(context); 
-        return true;
-      },
-      // 2. Gunakan Obx untuk LoadingOverlay (Menggantikan _saving)
+    // 2. Ganti WillPopScope dengan PopScope yang sudah diperbaiki
+    return PopScope(
+      canPop: true, // Izinkan aksi 'Back'
       child: Obx(
         () => Scaffold(
           backgroundColor: Colors.white,
           body: LoadingOverlay(
-            isLoading: controller.isLoading.value, // Gunakan state GetX
+            isLoading: controller.isLoading.value,
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const TopScreenImage(screenImageName: 'signup.png'),
-                    Expanded(
-                      flex: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 15,
+                child: Form(
+                  key: controller.formKey,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      // Column Utama
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // 3. HEADER/TITLE (Mengganti ScreenTitle dan TopScreenImage)
+                        const Center(
+                          child: Text(
+                            'HRD Sign Up',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueAccent,
+                            ),
+                          ),
                         ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const ScreenTitle(title: 'HRD Sign Up'),
-                            
-                            // 3. TEXT FIELD EMAIL
-                            CustomTextField(
-                              textField: TextField(
-                                controller: controller.email, // Hubungkan ke Controller
-                                keyboardType: TextInputType.emailAddress,
-                                style: const TextStyle(fontSize: 20),
-                                decoration: CColors.kTextInputDecoration.copyWith(
-                                  hintText: 'Email',
-                                ),
-                              ),
-                            ),
-                            
-                            // 4. TEXT FIELD PASSWORD
-                            CustomTextField(
-                              textField: TextField(
-                                controller: controller.password, 
-                                obscureText: true,
-                                style: const TextStyle(fontSize: 20),
-                                decoration: CColors.kTextInputDecoration.copyWith(
-                                  hintText: 'Password',
-                                ),
-                              ),
-                            ),
-                            
-                            // 5. TEXT FIELD CONFIRM PASSWORD
-                            // Note: Validasi konfirmasi password dilakukan di Controller/Logic.
-                            CustomTextField(
-                              textField: TextField(
-                                obscureText: true,
-                                // Gunakan onChanged untuk mengambil nilai konfirmasi password
-                                onChanged: (value) {
-                                  // Nanti Anda bisa menyimpan ini di variabel RX di Controller
-                                  // atau membandingkannya saat tombol ditekan.
-                                  controller.confirmPassword = value; 
-                                },
-                                style: const TextStyle(fontSize: 20),
-                                decoration: CColors.kTextInputDecoration.copyWith(
-                                  hintText: 'Confirm Password',
-                                ),
-                              ),
-                            ),
-                            
-                            // 6. BUTTON SIGN UP (Menggantikan CustomBottomScreen)
-                            CustomBottomScreen(
-                              textButton: 'Sign Up',
-                              heroTag: 'signup_btn',
-                              question: 'Have an account?',
-                              
-                              // HUBUNGKAN DENGAN CONTROLLER LARAVEL API
-                              buttonPressed: () async {
-                                FocusManager.instance.primaryFocus?.unfocus();
-                                // Panggil fungsi registrasi Email/Password
-                                controller.registerHrd(AuthMethod.emailPassword);
-                              },
-                              
-                              // Tombol yang mengarah ke halaman Login
-                              questionPressed: () async {
-                                Navigator.pushNamed(context, HrdLoginScreen.id); 
-                              },
-                            ),
-                          ],
+                        const SizedBox(height: 50),
+
+                        // 4. TEXT FIELD EMAIL (Mengganti CustomTextField)
+                        TextFormField(
+                          controller: controller.email,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) =>
+                              value!.isEmpty ? 'Email wajib diisi.' : null,
+                          decoration: const InputDecoration(
+                            hintText: 'Email',
+                            border: OutlineInputBorder(),
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 15),
+
+                        // 5. TEXT FIELD PASSWORD
+                        TextFormField(
+                          controller: controller.password,
+                          obscureText: true,
+                          validator: (value) =>
+                              value!.isEmpty ? 'Password wajib diisi.' : null,
+                          decoration: const InputDecoration(
+                            hintText: 'Password',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+
+                        // 6. TEXT FIELD CONFIRM PASSWORD
+                        TextFormField(
+                          obscureText: true,
+                          onChanged: (value) {
+                            controller.confirmPassword = value;
+                          },
+                          // Validasi Konfirmasi Password
+                          validator: (value) =>
+                              (value != controller.password.text)
+                              ? 'Password tidak cocok.'
+                              : null,
+                          decoration: const InputDecoration(
+                            hintText: 'Confirm Password',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+
+                        const SizedBox(height: 40),
+
+                        // 7. TOMBOL SIGN UP (Mengganti CustomBottomScreen)
+                        ElevatedButton(
+                          onPressed: controller.isLoading.value
+                              ? null
+                              : () => controller.registerHrd(
+                                  AuthMethod.emailPassword,
+                                ),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            backgroundColor: Colors.deepPurple,
+                          ),
+                          child: controller.isLoading.value
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text(
+                                  'Sign Up',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        // 8. Tombol Login (Pindah halaman)
+                        TextButton(
+                          onPressed: () =>
+                              Navigator.pushNamed(context, HrdLoginScreen.id),
+                          child: const Text('Have an account? Login Now'),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // 9. Tombol Google Sign-in
+                        ElevatedButton.icon(
+                          onPressed: controller.isLoading.value
+                              ? null
+                              : () => controller.registerHrd(AuthMethod.google),
+                          icon: const Icon(
+                            Icons.g_mobiledata_outlined,
+                            color: Colors.blue,
+                          ),
+                          label: const Text('Sign up with Google'),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: Colors.grey),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -121,6 +161,3 @@ class HrdRegistrationScreen extends StatelessWidget {
     );
   }
 }
-
-// Catatan: Hapus state class _SignUpScreenState yang lama.
-// Semua variabel (email, password) di handle oleh Controller.

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; 
+import 'package:get/get.dart';
 import 'package:job_app/common/styles/components.dart';
 import 'package:job_app/constants/colors.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 // Note: HrdRegistrationScreen.id is used for navigating back from HrdLoginScreen
-import '../controllers/hrd_login_controller.dart'; 
+import '../controllers/hrd_login_controller.dart';
 
-class HrdLoginScreen extends StatelessWidget { 
+class HrdLoginScreen extends StatelessWidget {
   const HrdLoginScreen({super.key});
-  static String id = 'hrd_login_screen'; 
+  static String id = 'hrd_login_screen';
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class HrdLoginScreen extends StatelessWidget {
 
     return WillPopScope(
       onWillPop: () async {
-        Navigator.pop(context); 
+        Navigator.pop(context);
         return true;
       },
       child: Obx(
@@ -27,8 +27,8 @@ class HrdLoginScreen extends StatelessWidget {
             child: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: Form( 
-                  key: controller.formKey, 
+                child: Form(
+                  key: controller.formKey,
                   child: Column(
                     children: [
                       const TopScreenImage(screenImageName: 'welcome.png'),
@@ -39,29 +39,30 @@ class HrdLoginScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const ScreenTitle(title: 'HRD Login'),
-                            
+
                             // 3. TEXT FIELD EMAIL
                             CustomTextField(
-                              textField: TextField( // Menggunakan TextField sesuai template
-                                controller: controller.email, 
+                              textField: TextField(
+                                // Menggunakan TextField sesuai template
+                                controller: controller.email,
                                 keyboardType: TextInputType.emailAddress,
                                 style: const TextStyle(fontSize: 20),
-                                decoration: CColors.kTextInputDecoration.copyWith(
-                                    hintText: 'Email'),
+                                decoration: CColors.kTextInputDecoration
+                                    .copyWith(hintText: 'Email'),
                               ),
                             ),
-                            
+
                             // 4. TEXT FIELD PASSWORD
                             CustomTextField(
                               textField: TextField(
                                 controller: controller.password,
                                 obscureText: true,
                                 style: const TextStyle(fontSize: 20),
-                                decoration: CColors.kTextInputDecoration.copyWith(
-                                    hintText: 'Password'),
+                                decoration: CColors.kTextInputDecoration
+                                    .copyWith(hintText: 'Password'),
                               ),
-                            ), // <--- PENUTUP CustomTextField
-                            
+                            ),
+
                             // 5. BUTTON LOGIN
                             CustomBottomScreen(
                               textButton: 'Login',
@@ -69,18 +70,20 @@ class HrdLoginScreen extends StatelessWidget {
                               question: 'Forgot password?',
                               buttonPressed: () async {
                                 FocusManager.instance.primaryFocus?.unfocus();
-                                controller.loginHrd(); 
+                                controller.loginHrd();
                               },
                               questionPressed: () {
-                                Get.snackbar('Fitur', 'Reset Password belum diimplementasikan.'); 
+                                Get.snackbar(
+                                  'Fitur',
+                                  'Reset Password belum diimplementasikan.',
+                                );
                               },
                             ), // <--- PENUTUP CustomBottomScreen
-                            
                             // 6. OPSIONAL: Tombol Login Google
                             ElevatedButton(
                               onPressed: controller.loginGoogle,
                               child: const Text('Login with Google'),
-                            ) 
+                            ),
                           ],
                         ),
                       ),
@@ -92,6 +95,6 @@ class HrdLoginScreen extends StatelessWidget {
           ),
         ),
       ),
-    ); 
+    );
   }
 }
