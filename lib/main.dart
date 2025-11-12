@@ -4,6 +4,8 @@ import 'package:job_app/features/user_dashboard/controllers/navigation_controlle
 import 'package:get/get.dart';
 
 void main() {
+  // PINDAHKAN Get.put() KE SINI (di luar widget tree)
+  Get.put(NavigationControllers()); 
   runApp(const MyApp());
 }
 
@@ -12,17 +14,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(NavigationControllers());
-    return GetMaterialApp(
+    // HAPUS Get.put(NavigationControllers()) DARI SINI!
+    
+    // Ini sekarang sudah aman
+    return GetMaterialApp( 
       title: 'Job App',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      home: const HrdRegistrationScreen(),
-      // home: const Center(
-      //   child: Text('Testing', style: TextStyle(color: Colors.red,fontSize: 30),),
-      // ),
+      home: const HrdRegistrationScreen(), 
     );
   }
 }
