@@ -36,9 +36,18 @@ class HrdSignupController extends GetxController {
     super.onClose();
   }
 
-  // =======================================================
-  // FUNGSI UTAMA: MENGARAHKAN ALUR OTENTIKASI
-  // =======================================================
+  static String? validatePassword(String? password) {
+    if (password == null) {
+      return 'Password harus di isi';
+    }
+    if (password.length < 8) {
+      return 'Password minimal 8 character';
+    }
+    if (!RegExp(r'[0-9]').hasMatch(password)) {
+      return 'password harus mengandung setidaknya 1 angka';
+    }
+    return null;
+  }
 
   Future<void> registerHrd(AuthMethod method) async {
     // 1. Validasi form HANYA jika menggunakan Email/Password
@@ -56,15 +65,8 @@ class HrdSignupController extends GetxController {
         }
         return;
       }
-      if (password.text.length <= 8) {
-        Get.snackbar(
-          'Gagal!',
-          "Password miniman harus 8 huruf atau angka",
-          backgroundColor: CupertinoColors.systemYellow,
-          colorText: Colors.black);
-      }
     }
-
+    //logic api call
     isLoading.value = true;
 
     try {
