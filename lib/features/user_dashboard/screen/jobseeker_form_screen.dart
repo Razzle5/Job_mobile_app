@@ -5,17 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
-
-// Ganti Provider dengan GetX
 import 'package:get/get.dart'; 
-// Asumsi Anda akan membuat custom colors
-// import '../utils/custom_colors.dart'; // Hapus/Ganti ini dengan import warna Anda
 
-// Import Model dan Repository Anda
-// import '../../../../data/repositories/job_seeker_repository.dart'; // Akan dibuat
-// import '../../../../data/models/job_seeker_model.dart'; // Akan digunakan
-
-// Asumsi: CustomColors dan AccessoryWidgets akan diatasi nanti
 class CustomColors { 
   static const Color darkAccent = Color(0xFF1976D2);
   static const Color lightAccent = Color(0xFF64B5F6);
@@ -25,7 +16,7 @@ class AccessoryWidgets {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 }
-// END ASUMSI
+
 
 class JobSeekerDataCollection extends StatefulWidget {
   const JobSeekerDataCollection(
@@ -36,10 +27,10 @@ class JobSeekerDataCollection extends StatefulWidget {
 }
 
 class _JobSeekerDataCollectionState extends State<JobSeekerDataCollection> {
-  // Global Key untuk Validasi Form
+
   final _key = GlobalKey<FormState>();
   
-  // Controllers untuk semua field
+
   final TextEditingController _firstNameController = TextEditingController(); // Name
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _dateController = TextEditingController(); // DOB (String)
@@ -61,9 +52,8 @@ class _JobSeekerDataCollectionState extends State<JobSeekerDataCollection> {
 
   PlatformFile? file;
   bool isLoading = false;
-  DateTime? dob; // Menyimpan objek DateTime DOB
+  DateTime? dob; 
   
-  // Nanti akan ada List Dropdown untuk Pendidikan
 
   @override
   void dispose() {

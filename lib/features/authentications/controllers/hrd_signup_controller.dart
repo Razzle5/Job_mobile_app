@@ -96,7 +96,7 @@ class HrdSignupController extends GetxController {
 
       Get.snackbar('Sukses!', 'Akun HRD berhasil dibuat. ID: $userId');
       // NAVIGASI: Pindah ke CompanyDataScreen
-      // Get.off(() => CompanyDataScreen(userId: userId));
+      Get.offAllNamed('/hrd/login');
     } else {
       String errorMessage = result['message'];
 
