@@ -8,6 +8,7 @@ import '../controllers/hrd_login_controller.dart';
 
 class HrdLoginScreen extends StatelessWidget {
   const HrdLoginScreen({super.key});
+  static const String routeId = 'hrd/login';
   static String id = 'hrd_login_screen';
 
   @override

@@ -9,6 +9,7 @@ import 'hrd_login_screen.dart';
 
 class HrdRegistrationScreen extends StatelessWidget {
   const HrdRegistrationScreen({super.key});
+  static const String routeId = 'hrd/regist';
   static String id = 'hrd_registration_screen';
 
   @override

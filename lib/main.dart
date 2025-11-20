@@ -19,12 +19,17 @@ class MyApp extends StatelessWidget {
 
     // Ini sekarang sudah aman
     return GetMaterialApp(
-      title: 'Job App',
+      title: 'NextStep',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
-      home: const HrdRegistrationScreen(),
+      initialRoute:HrdRegistrationScreen.id,
+      getPages: [
+        GetPage(name: HrdRegistrationScreen.id, page: ()=> const HrdRegistrationScreen(),),
+        GetPage(name: HrdLoginScreen.id, page: ()=> const HrdLoginScreen(),)
+
+      ],
     );
   }
 }

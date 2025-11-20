@@ -11,19 +11,17 @@ class HrdSignupController extends GetxController {
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
 
-  // Perbaikan Constructor: Gunakan constructor default tanpa 'const'
-  // (Ini bekerja untuk versi google_sign_in 6.2.1)
   late final GoogleSignIn _googleSignIn;
 
   late String
-  confirmPassword; // Digunakan untuk menyimpan nilai konfirmasi password
+  confirmPassword; 
 
   RxBool isLoading = false.obs;
   final AuthRepository _repository = AuthRepository();
 
   @override
   void onInit() {
-    // Inisialisasi GoogleSignIn di onInit
+   
     _googleSignIn = GoogleSignIn(scopes: ['email']);
     super.onInit();
   }
@@ -50,9 +48,8 @@ class HrdSignupController extends GetxController {
   }
 
   Future<void> registerHrd(AuthMethod method) async {
-    // 1. Validasi form HANYA jika menggunakan Email/Password
+
     if (method == AuthMethod.emailPassword) {
-      // Validasi TextFormFields dan juga validasi password manual
       if (!formKey.currentState!.validate() ||
           password.text != confirmPassword) {
         if (password.text != confirmPassword) {
@@ -87,7 +84,7 @@ class HrdSignupController extends GetxController {
     }
   }
 
-  // Logic internal lainnya...
+
   Future<void> _registerWithEmailPassword() async {
     final result = await _repository.registerHrd(email.text, password.text);
 
@@ -95,7 +92,7 @@ class HrdSignupController extends GetxController {
       final userId = result['data']['user_id'];
 
       Get.snackbar('Sukses!', 'Akun HRD berhasil dibuat. ID: $userId');
-      // NAVIGASI: Pindah ke CompanyDataScreen
+
       Get.offAllNamed('/hrd/login');
     } else {
       String errorMessage = result['message'];
