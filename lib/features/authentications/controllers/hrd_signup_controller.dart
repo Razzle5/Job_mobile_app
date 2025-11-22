@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:job_app/data/repositories/auth_repository_hrd.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:job_app/constants/enums.dart';
+import '../screen/hrd_login_screen.dart';
 
 class HrdSignupController extends GetxController {
   // --- PROPERTI STATE DAN CONTROLLERS ---
@@ -13,15 +14,13 @@ class HrdSignupController extends GetxController {
 
   late final GoogleSignIn _googleSignIn;
 
-  late String
-  confirmPassword; 
+  late String confirmPassword;
 
   RxBool isLoading = false.obs;
   final AuthRepository _repository = AuthRepository();
 
   @override
   void onInit() {
-   
     _googleSignIn = GoogleSignIn(scopes: ['email']);
     super.onInit();
   }
@@ -48,7 +47,6 @@ class HrdSignupController extends GetxController {
   }
 
   Future<void> registerHrd(AuthMethod method) async {
-
     if (method == AuthMethod.emailPassword) {
       if (!formKey.currentState!.validate() ||
           password.text != confirmPassword) {
@@ -84,7 +82,6 @@ class HrdSignupController extends GetxController {
     }
   }
 
-
   Future<void> _registerWithEmailPassword() async {
     final result = await _repository.registerHrd(email.text, password.text);
 
@@ -93,7 +90,7 @@ class HrdSignupController extends GetxController {
 
       Get.snackbar('Sukses!', 'Akun HRD berhasil dibuat. ID: $userId');
 
-      Get.offAllNamed('/hrd/login');
+      Get.offAllNamed(HrdLoginScreen.id);
     } else {
       String errorMessage = result['message'];
 

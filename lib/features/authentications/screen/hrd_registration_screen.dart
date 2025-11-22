@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_overlay/loading_overlay.dart';
-
-import 'package:job_app/constants/enums.dart'; // Import Enum AuthMethod
-
-import '../controllers/hrd_signup_controller.dart';
-import 'hrd_login_screen.dart';
+import 'package:job_app/constants/enums.dart';
+import 'package:job_app/features/authentications/controllers/hrd_signup_controller.dart';
+import 'package:job_app/features/authentications/screen/hrd_login_screen.dart';
 
 class HrdRegistrationScreen extends StatelessWidget {
   const HrdRegistrationScreen({super.key});
-  static const String routeId = 'hrd/regist';
-  static String id = 'hrd_registration_screen';
+  static const String id = '/hrd_registration_screen';
 
   @override
   Widget build(BuildContext context) {
-    // 1. Akses Controller (Sudah benar)
-    final controller = Get.put(HrdSignupController());
+    final controller = Get.find<HrdSignupController>();
+    // accsess controller
 
     return PopScope(
       canPop: true,
@@ -33,7 +30,7 @@ class HrdRegistrationScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // 3. HEADER/TITLE (Mengganti ScreenTitle)
+                        //HEADER/TITLE
                         const Center(
                           child: Text(
                             'HRD Sign Up',
@@ -46,7 +43,7 @@ class HrdRegistrationScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 50),
 
-                        // 4. TEXT FIELD EMAIL
+                        // TEXT FIELD EMAIL
                         TextFormField(
                           controller: controller.email,
                           keyboardType: TextInputType.emailAddress,
@@ -59,12 +56,12 @@ class HrdRegistrationScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 15),
 
-                        // 5. TEXT FIELD PASSWORD
+                        // TEXT FIELD PASSWORD
                         TextFormField(
                           controller: controller.password,
                           obscureText: true,
                           validator: (value) =>
-                              HrdSignupController.validatePassword(value),
+                              value!.isEmpty ? 'Password wajib diisi.' : null,
                           decoration: const InputDecoration(
                             hintText: 'Password',
                             border: OutlineInputBorder(),
@@ -72,13 +69,13 @@ class HrdRegistrationScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 15),
 
-                        // 6. TEXT FIELD CONFIRM PASSWORD
+                        //  TEXT FIELD CONFIRM PASSWORD
                         TextFormField(
                           obscureText: true,
                           onChanged: (value) {
                             controller.confirmPassword = value;
                           },
-                          // Validasi Konfirmasi Password
+                          // password confirm validation
                           validator: (value) =>
                               (value != controller.password.text)
                               ? 'Password tidak cocok.'
@@ -91,7 +88,7 @@ class HrdRegistrationScreen extends StatelessWidget {
 
                         const SizedBox(height: 40),
 
-                        // 7. TOMBOL SIGN UP
+                        //  sign up button
                         ElevatedButton(
                           onPressed: controller.isLoading.value
                               ? null
@@ -122,22 +119,23 @@ class HrdRegistrationScreen extends StatelessWidget {
 
                         const SizedBox(height: 10),
 
-                        // 8. Tombol Login
+                        // login destination button
                         TextButton(
-                          onPressed: () =>
-                              Navigator.pushNamed(context, HrdLoginScreen.id),
+                          onPressed: () {
+                            Get.toNamed(HrdLoginScreen.id);
+                          },
                           child: const Text('Have an account? Login Now'),
                         ),
 
                         const SizedBox(height: 20),
 
-                        // 9. Tombol Google Sign-in
+                        // Google Sign-in button
                         ElevatedButton.icon(
                           onPressed: controller.isLoading.value
                               ? null
                               : () => controller.registerHrd(AuthMethod.google),
                           icon: const Icon(
-                            Icons.g_mobiledata,
+                            Icons.g_mobiledata_outlined,
                             color: Colors.blue,
                           ),
                           label: const Text('Sign up with Google'),
