@@ -11,7 +11,8 @@ class HrdRegistrationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  final HrdSignupController controller = Get.find<HrdSignupController>();
+  final HrdSignupController controller = Get.put(HrdSignupController());
+
     // accsess controller
 
     return PopScope(
@@ -122,7 +123,8 @@ class HrdRegistrationScreen extends StatelessWidget {
                         // login destination button
                         TextButton(
                           onPressed: () {
-                            Get.toNamed(HrdLoginScreen.id);
+                               controller.isLoading.value = false;
+                                Get.back();
                           },
                           child: const Text('Have an account? Login Now'),
                         ),

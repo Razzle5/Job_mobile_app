@@ -11,10 +11,15 @@ class HrdLoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  final HrdLoginController controller =  Get.find<HrdLoginController>();
+   final HrdLoginController controller = Get.put(HrdLoginController());
     return PopScope( 
-      canPop: true, 
-      onPopInvokedWithResult: (didPop,result) {
+    canPop: !controller.isLoading.value, // Prevent back during loading
+    onPopInvokedWithResult: (didPop, result) {
+      if (didPop) {
+        // Clean up if needed
+        controller.email.clear();
+        controller.password.clear();
+            }
       },
       child: Obx(
         () => Scaffold(
@@ -70,9 +75,10 @@ class HrdLoginScreen extends StatelessWidget {
                         
                         // 6. Tombol ke Sign Up
                         TextButton(
-                            onPressed: () {
-                                              Get.toNamed(HrdRegistrationScreen.id);
-                                          }, 
+                           onPressed: () {
+                                    controller.isLoading.value = false;
+                                    Get.toNamed(HrdRegistrationScreen.id);
+                              }, 
                             child: const Text("Don't have an account? Sign Up"),
                         ),
                         
