@@ -11,8 +11,7 @@ class HrdLoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  final HrdLoginController controller = Get.put(HrdLoginController());
-
+  final HrdLoginController controller =  Get.find<HrdLoginController>();
     return PopScope( 
       canPop: true, 
       onPopInvokedWithResult: (didPop,result) {

@@ -61,7 +61,7 @@ class HrdLoginController extends GetxController {
         final userId = result['data']['user_id'];
 
         Get.snackbar('Sukses!', 'Login berhasil. Selamat datang!');
-        Get.offAllNamed('/hrd/dashboard');
+        // Get.offAllNamed('/hrd/dashboard');
         return;
       } else {
         Get.snackbar(

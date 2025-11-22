@@ -11,7 +11,7 @@ class HrdRegistrationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<HrdSignupController>();
+  final HrdSignupController controller = Get.find<HrdSignupController>();
     // accsess controller
 
     return PopScope(
