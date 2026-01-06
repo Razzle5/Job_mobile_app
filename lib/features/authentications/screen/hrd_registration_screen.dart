@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:job_app/constants/enums.dart';
 import 'package:job_app/features/authentications/controllers/hrd_signup_controller.dart';
-import 'package:job_app/features/authentications/screen/hrd_login_screen.dart';
 
 class HrdRegistrationScreen extends StatelessWidget {
   const HrdRegistrationScreen({super.key});
@@ -11,9 +10,7 @@ class HrdRegistrationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  final HrdSignupController controller = Get.put(HrdSignupController());
-
-    // accsess controller
+    final HrdSignupController controller = Get.put(HrdSignupController());
 
     return PopScope(
       canPop: true,
@@ -31,7 +28,7 @@ class HrdRegistrationScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        //HEADER/TITLE
+                        // ================= HEADER =================
                         const Center(
                           child: Text(
                             'HRD Sign Up',
@@ -42,45 +39,60 @@ class HrdRegistrationScreen extends StatelessWidget {
                             ),
                           ),
                         ),
+
                         const SizedBox(height: 50),
 
-                        // TEXT FIELD EMAIL
+                        // ================= EMAIL =================
                         TextFormField(
                           controller: controller.email,
                           keyboardType: TextInputType.emailAddress,
-                          validator: (value) =>
-                              value!.isEmpty ? 'Email wajib diisi.' : null,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Email wajib diisi';
+                            }
+                            return null;
+                          },
                           decoration: const InputDecoration(
                             hintText: 'Email',
                             border: OutlineInputBorder(),
                           ),
                         ),
+
                         const SizedBox(height: 15),
 
-                        // TEXT FIELD PASSWORD
+                        // ================= PASSWORD =================
                         TextFormField(
                           controller: controller.password,
                           obscureText: true,
-                          validator: (value) =>
-                              value!.isEmpty ? 'Password wajib diisi.' : null,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Password wajib diisi';
+                            }
+                            if (value.length < 6) {
+                              return 'Password minimal 6 karakter';
+                            }
+                            return null;
+                          },
                           decoration: const InputDecoration(
                             hintText: 'Password',
                             border: OutlineInputBorder(),
                           ),
                         ),
+
                         const SizedBox(height: 15),
 
-                        //  TEXT FIELD CONFIRM PASSWORD
+                        // ================= CONFIRM PASSWORD =================
                         TextFormField(
                           obscureText: true,
                           onChanged: (value) {
                             controller.confirmPassword = value;
                           },
-                          // password confirm validation
-                          validator: (value) =>
-                              (value != controller.password.text)
-                              ? 'Password tidak cocok.'
-                              : null,
+                          validator: (value) {
+                            if (value != controller.password.text) {
+                              return 'Password tidak cocok';
+                            }
+                            return null;
+                          },
                           decoration: const InputDecoration(
                             hintText: 'Confirm Password',
                             border: OutlineInputBorder(),
@@ -89,13 +101,15 @@ class HrdRegistrationScreen extends StatelessWidget {
 
                         const SizedBox(height: 40),
 
-                        //  sign up button
+                        // ================= SIGN UP BUTTON =================
                         ElevatedButton(
                           onPressed: controller.isLoading.value
                               ? null
-                              : () => controller.registerHrd(
-                                  AuthMethod.emailPassword,
-                                ),
+                              : () {
+                                  controller.registerHrd(
+                                    AuthMethod.emailPassword,
+                                  );
+                                },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 15),
                             backgroundColor: Colors.deepPurple,
@@ -120,22 +134,23 @@ class HrdRegistrationScreen extends StatelessWidget {
 
                         const SizedBox(height: 10),
 
-                        // login destination button
+                        // ================= LOGIN REDIRECT =================
                         TextButton(
-                          onPressed: () {
-                               controller.isLoading.value = false;
-                                Get.back();
-                          },
+                          onPressed: () => Get.back(),
                           child: const Text('Have an account? Login Now'),
                         ),
 
                         const SizedBox(height: 20),
 
-                        // Google Sign-in button
+                        // ================= GOOGLE SIGN UP =================
                         ElevatedButton.icon(
                           onPressed: controller.isLoading.value
                               ? null
-                              : () => controller.registerHrd(AuthMethod.google),
+                              : () {
+                                  controller.registerHrd(
+                                    AuthMethod.google,
+                                  );
+                                },
                           icon: const Icon(
                             Icons.g_mobiledata_outlined,
                             color: Colors.blue,

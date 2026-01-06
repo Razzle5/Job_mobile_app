@@ -1,11 +1,12 @@
+// FILE: features/authentications/controllers/hrd_login_controller.dart
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:job_app/data/repositories/auth_repository_hrd.dart'; // Sesuaikan path jika perlu
+import 'package:job_app/data/repositories/auth_repository_hrd.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:job_app/features/hrd_dashboard/screen/hrd_home_screen.dart';
 
 class HrdLoginController extends GetxController {
-  // Properti untuk Form dan Loading State
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
@@ -23,72 +24,123 @@ class HrdLoginController extends GetxController {
 
   @override
   void onClose() {
-    _googleSignIn.signOut();
     email.dispose();
     password.dispose();
     super.onClose();
   }
 
-  // 1. LOGIC LOGIN EMAIL/PASSWORD
+  // ================= LOGIN EMAIL / PASSWORD =================
 
   Future<void> loginHrd() async {
     if (!formKey.currentState!.validate()) return;
 
-    isLoading.value = true;
     if (email.text.isEmpty || password.text.isEmpty) {
       Get.snackbar(
-        'Gagal!',
-        'Email dan Password wajib diisi.',
-        backgroundColor: Colors.yellow.shade800,
-        colorText: Colors.black,
+        'Gagal',
+        'Email dan password wajib diisi',
+        backgroundColor: Colors.orange,
       );
       return;
     }
+
     if (password.text.length < 8) {
       Get.snackbar(
-        'Gagal!',
-        'Password minimal 8 huruf atau angka',
-        backgroundColor: Colors.yellowAccent,
-        colorText: Colors.black,
+        'Gagal',
+        'Password minimal 8 karakter',
+        backgroundColor: Colors.orange,
       );
       return;
     }
+
     try {
-      final result = await _repository.loginHrd(email.text, password.text);
-      // bool loginSuccess = true;
+      isLoading.value = true;
 
-      if (result['success']) {
-        final userId = result['data']['user_id'];
+      final result = await _repository.loginHrd(
+        email.text.trim(),
+        password.text.trim(),
+      );
 
-        Get.snackbar('Sukses!', 'Login berhasil. Selamat datang!');
-        // Get.offAllNamed('/hrd/dashboard');
-        return;
+      isLoading.value = false;
+
+      if (result['success'] == true) {
+        // 🔥 SIMPAN TOKEN (INI YANG BARU!)
+        final token = result['data']['token'];
+        await _repository.saveToken(token);
+        
+        debugPrint('Token saved: ${token.substring(0, 20)}...');
+
+        // 🔥 SIMPAN USER DATA (opsional, jika backend return user info)
+        if (result['data']['user'] != null) {
+          await _repository.saveUserData(result['data']['user']);
+          debugPrint('User data saved');
+        }
+
+        // Navigate ke home
+        Get.offAllNamed(HrdHomeScreen.id);
+
+        // Snackbar setelah navigasi
+        Future.delayed(const Duration(milliseconds: 300), () {
+          Get.snackbar(
+            'Sukses',
+            'Login HRD berhasil',
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 2),
+          );
+        });
       } else {
         Get.snackbar(
-          'Gagal Login',
-          'Email atau password salah.',
+          'Login gagal',
+          result['message'] ?? 'Email atau password salah',
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
       }
     } catch (e) {
+      isLoading.value = false;
+      debugPrint('Login error: $e');
       Get.snackbar(
-        'Error Koneksi',
-        'Gagal terhubung ke server: ${e.toString()}',
+        'Error',
+        'Gagal terhubung ke server',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
-    } finally {
-      isLoading.value = false;
     }
   }
+ 
+  // ================= LOGIN GOOGLE =================
 
-  //logic login google
   Future<void> loginGoogle() async {
     Get.snackbar(
-      'Fitur',
-      'Fitur Login Google belum diimplementasikan.',
+      'Info',
+      'Login Google belum tersedia',
       snackPosition: SnackPosition.BOTTOM,
     );
+  }
+
+  // ================= LOGOUT =================
+  
+  Future<void> logout() async {
+    try {
+      await _repository.logout();
+      debugPrint('Logged out successfully');
+      
+      Get.offAllNamed('/login'); // Kembali ke login screen
+      
+      Get.snackbar(
+        'Sukses',
+        'Logout berhasil',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      debugPrint('Logout error: $e');
+      Get.snackbar(
+        'Error',
+        'Gagal logout',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 }
