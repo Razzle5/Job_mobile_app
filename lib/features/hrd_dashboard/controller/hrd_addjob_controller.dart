@@ -54,7 +54,7 @@ class AddJobController extends GetxController {
 
       if (result['success'] == true) {
         // Kembali ke halaman sebelumnya
-        Get.back();
+        Get.back(result: true);
         
         // Tampilkan success message
         Future.delayed(const Duration(milliseconds: 300), () {

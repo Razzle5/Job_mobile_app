@@ -6,6 +6,7 @@ import 'package:job_app/features/authentications/screen/hrd_login_screen.dart';
 import 'package:job_app/features/authentications/screen/hrd_registration_screen.dart';
 import 'package:job_app/features/hrd_dashboard/screen/hrd_home_screen.dart';
 import 'package:job_app/features/hrd_dashboard/screen/hrd_addjob_screen.dart';
+import 'package:job_app/features/hrd_dashboard/controller/hrd_addjob_controller.dart';
 
 void main() {
   runApp(const MyApp());

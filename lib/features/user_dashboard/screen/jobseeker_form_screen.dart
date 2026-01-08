@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:get/get.dart'; 
+import 'package:job_app/features/user_dashboard/controllers/job_seeker_controller.dart';
 
 class CustomColors { 
   static const Color darkAccent = Color(0xFF1976D2);
@@ -73,7 +74,6 @@ class _JobSeekerDataCollectionState extends State<JobSeekerDataCollection> {
      Get.offAll(() => const Text("Home Screen Placeholder")); // Ganti dengan Home Screen Anda
   }
 
-  // LOGIKA PENGISIAN DATA KE API (Contoh)
   Future<void> submitData() async {
     if (!_key.currentState!.validate()) return;
     
@@ -86,21 +86,28 @@ class _JobSeekerDataCollectionState extends State<JobSeekerDataCollection> {
     setState(() { isLoading = true; });
 
     // 2. Kumpulkan semua data
-    final educationValue = selectedEducation!;
-    // Nanti di sini Anda akan memanggil JobSeekerRepository().submit(model, file);
-    // bool isSuccessful = await JobSeekerRepository().submit( /* ... */ ); 
-    
-    // Simulasi Proses
-    await Future.delayed(const Duration(seconds: 2));
-    bool isSuccessful = true; // Anggap sukses
+    final controller = Get.put(JobSeekerController());
+      final success = await controller.submit(
+        data: {
+          'first_name': _firstNameController.text,
+          'last_name': _lastNameController.text,
+          'birth_date': _dateController.text,
+          'phone_number': _phoneController.text,
+          'email': _emailController.text,
+          'domicile': _domicileController.text,
+          'full_address': _addressController.text,
+          'current_education': selectedEducation!,
+        },
+        cv: file!,
+      );
     
     setState(() { isLoading = false; });
     
-    if (isSuccessful) {
-      AccessoryWidgets.showSnackBar("Data Berhasil Disimpan!", context);
+    if (success) {
+      AccessoryWidgets.showSnackBar("Data berhasil disimpan", context);
       nextPage();
     } else {
-      AccessoryWidgets.showSnackBar("Penyimpanan data gagal.", context);
+      AccessoryWidgets.showSnackBar("Gagal menyimpan data", context);
     }
   }
 

@@ -4,6 +4,9 @@ import 'package:job_app/common/styles/widget/custom_shapes/container/primary_hea
 import 'package:job_app/common/styles/widget/job__card.dart';
 import 'package:job_app/data/models/job_model.dart';
 import 'package:job_app/data/repositories/job_repository.dart';
+import 'package:get/get.dart';
+import 'package:job_app/features/hrd_dashboard/screen/hrd_addjob_screen.dart';
+
 
 class HrdHomeScreen extends StatefulWidget {
   const HrdHomeScreen({super.key});
@@ -21,6 +24,12 @@ class _HrdHomeScreenState extends State<HrdHomeScreen> {
   void initState() {
     super.initState(); 
     _jobFuture = _jobRepository.fetchJobs();
+  }
+  
+  void _refreshJobs() {
+    setState(() {
+      _jobFuture = _jobRepository.fetchJobs();
+    });
   }
 
   void unfocusKeyboard() {
@@ -105,6 +114,25 @@ class _HrdHomeScreenState extends State<HrdHomeScreen> {
           ),
         ),
       ),
+            // 🔥 FLOATING ACTION BUTTON (Tombol +)
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // Navigate ke AddJobScreen
+          final result = await Get.toNamed(AddJobScreen.id);
+          
+          // Refresh data jika berhasil tambah lowongan
+          if (result == true) {
+            _refreshJobs();
+          }
+        },
+        backgroundColor: Colors.purple[600],
+        child: const Icon(
+          Icons.add,
+          size: 32,
+          color: Colors.white,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
