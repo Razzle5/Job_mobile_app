@@ -15,7 +15,7 @@ class AddJobScreen extends StatelessWidget {
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('Tambah Lowongan'),
-        backgroundColor: Colors.purple[600],
+        backgroundColor: const Color.fromARGB(255, 15, 71, 167),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -170,7 +170,7 @@ class AddJobScreen extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: controller.submitJob,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple[600],
+                          backgroundColor: const Color.fromARGB(255, 15, 71, 167),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -226,7 +226,7 @@ class AddJobScreen extends StatelessWidget {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.purple[600]!, width: 2),
+        borderSide: BorderSide(color: Colors.blue[600]!, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -246,12 +246,12 @@ class AddJobScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.purple[600] : Colors.grey[200],
+          color: isSelected ? Colors.blue[600] : Colors.grey[200],
           borderRadius: BorderRadius.circular(10),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.purple.withOpacity(0.3),
+                    color: Colors.blue.withOpacity(0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),

@@ -6,9 +6,9 @@ class JobModel {
   final String location;
   final String salary;
   final String type;
-  final String companyName; 
+  final String companyName;
   final String companyLogo;
-  
+
   JobModel({
     required this.id,
     required this.companyId,
@@ -21,20 +21,28 @@ class JobModel {
     required this.companyLogo,
   });
 
-  factory JobModel.fromJson(Map<String,dynamic>json){
+  factory JobModel.fromJson(Map<String, dynamic> json) {
     final companyData = json['company'] as Map<String, dynamic>?;
 
     return JobModel(
-      id : json['id'] as int,
-      companyId: json['company_id'] as int,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      location: json['location'] as String,
-      salary: json['salary'] as String,
-      type: json['type'] as String,
-
-      companyName: companyData?['brand_name'] ?? 'N/A', 
+      id: _parseInt(json['id']),
+      companyId: _parseInt(json['company_id']),
+      title: json['title'].toString(),
+      description: json['description'].toString(),
+      location: json['location'].toString(),
+      salary: json['salary'].toString(),
+      type: json['type'].toString(),
+      companyName: companyData?['brand_name']?.toString() ?? 'N/A',
       companyLogo: 'Iconsax.facebook',
     );
+  }
+
+  // Helper method to safely parse int
+  static int _parseInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0;
   }
 }

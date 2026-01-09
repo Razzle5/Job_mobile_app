@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:job_app/data/models/job_model.dart';
 import 'package:job_app/constants/api_constants.dart';
@@ -13,22 +14,72 @@ class JobRepository {
   Future<List<JobModel>> fetchJobs() async {
     final url = Uri.parse('${ApiConstants.tBaseUrl}/api/jobs');
 
+    print('🔥 fetchJobs() -> GET $url');
+
     try {
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(const Duration(seconds: 20));
+
+      print('✅ fetchJobs response: ${response.statusCode}');
+      print(
+          '📄 Response body (first 500 chars): ${response.body.substring(0, response.body.length > 500 ? 500 : response.body.length)}');
+
+      // 🔥 CHECK IF RESPONSE IS HTML (error page)
+      if (response.body.contains('<!DOCTYPE') ||
+          response.body.contains('<html')) {
+        print('❌ ERROR: Backend returned HTML instead of JSON!');
+        print('📍 Full response body:\n${response.body}');
+        return [];
+      }
 
       if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        final jobListJson = body['jobs'] as List;
-        return jobListJson
-            .map(
-                (jobJson) => JobModel.fromJson(jobJson as Map<String, dynamic>))
-            .toList();
+        try {
+          final body = jsonDecode(response.body);
+          print('📦 Response body decoded: $body');
+
+          // 🔥 Handle both "jobs" and "data" keys from different API responses
+          final jobListJson = (body['jobs'] ?? body['data']) as List? ?? [];
+          print('📋 Jobs count: ${jobListJson.length}');
+
+          if (jobListJson.isEmpty) {
+            print('⚠️ No jobs returned from API');
+            return [];
+          }
+
+          final jobs = <JobModel>[];
+          for (int i = 0; i < jobListJson.length; i++) {
+            try {
+              final jobJson = jobListJson[i] as Map<String, dynamic>;
+              print('🔍 Parsing job $i: $jobJson');
+              final job = JobModel.fromJson(jobJson);
+              jobs.add(job);
+              print('✅ Job $i parsed successfully: ${job.title}');
+            } catch (e) {
+              print('❌ Error parsing job $i: $e');
+              print('   Job data: ${jobListJson[i]}');
+            }
+          }
+
+          print('📦 Total jobs successfully parsed: ${jobs.length}');
+          return jobs;
+        } catch (e) {
+          // Jika parsing gagal, log dan kembalikan list kosong
+          print('❌ Error parsing jobs response: $e');
+          print('📄 Response body: ${response.body}');
+          return [];
+        }
       } else {
-        throw Exception(
-            'Gagal memuat pekerjaan, Status code: ${response.statusCode}');
+        // Log error tapi jangan throw - return empty list
+        print('❌ fetchJobs non-200 status: ${response.statusCode}');
+        print('📄 Response body:\n${response.body}');
+        return [];
       }
+    } on TimeoutException catch (e) {
+      print('⏱️ fetchJobs TIMEOUT after 20s: $e');
+      return [];
     } catch (e) {
-      throw Exception('Gagal koneksi ke server: $e');
+      // Network error atau timeout - log dan return empty list
+      print('❌ fetchJobs exception: $e');
+      return [];
     }
   }
 
@@ -69,15 +120,30 @@ class JobRepository {
       );
 
       if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        final jobListJson = body['data'] as List;
-        return jobListJson
-            .map(
-                (jobJson) => JobModel.fromJson(jobJson as Map<String, dynamic>))
-            .toList();
+        try {
+          final body = jsonDecode(response.body);
+          final jobListJson =
+              (body['data'] is List) ? body['data'] as List : [];
+          return jobListJson
+              .map((jobJson) =>
+                  JobModel.fromJson(jobJson as Map<String, dynamic>))
+              .toList();
+        } catch (e) {
+          // Jika parsing gagal, kembalikan list kosong agar UI menampilkan pesan kosong
+          print('Error parsing jobs response: $e');
+          return [];
+        }
       } else {
-        throw Exception(
-            'Gagal memuat lowongan company, Status code: ${response.statusCode}');
+        // Jangan melempar Exception yang tidak tertangani di UI; log dan kembalikan list kosong
+        try {
+          final body = jsonDecode(response.body);
+          print(
+              'getJobsByCompany non-200: ${response.statusCode}, message: ${body['message'] ?? response.body}');
+        } catch (_) {
+          print(
+              'getJobsByCompany non-200: ${response.statusCode}, body: ${response.body}');
+        }
+        return [];
       }
     } catch (e) {
       throw Exception('Error: $e');

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:job_app/features/authentications/controllers/hrd_login_controller.dart';
+import 'package:job_app/features/authentications/controller/hrd_login_controller.dart';
 import 'hrd_registration_screen.dart';
 
 class HrdLoginScreen extends StatelessWidget {

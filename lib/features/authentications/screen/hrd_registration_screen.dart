@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:job_app/constants/enums.dart';
-import 'package:job_app/features/authentications/controllers/hrd_signup_controller.dart';
+import 'package:job_app/features/authentications/controller/hrd_signup_controller.dart';
 
 class HrdRegistrationScreen extends StatelessWidget {
   const HrdRegistrationScreen({super.key});

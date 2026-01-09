@@ -1,13 +1,15 @@
 // lib/common/widgets/job_card.dart
 
 import 'package:flutter/material.dart';
-import 'package:job_app/constants/colors.dart'; 
+import 'package:job_app/constants/colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:job_app/data/models/job_model.dart';
+import 'package:get/get.dart';
+import 'package:job_app/features/hrd_dashboard/controller/hrd_job_list_controller.dart';
 
 class TJobCard extends StatelessWidget {
   final JobModel jobModel;
-  const TJobCard({super.key,required this.jobModel});
+  const TJobCard({super.key, required this.jobModel});
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +25,14 @@ class TJobCard extends StatelessWidget {
             color: Colors.grey.withAlpha(25),
             spreadRadius: 1,
             blurRadius: 5,
-            offset: const Offset(0, 3), 
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. BARIS ATAS: Logo, Judul Pekerjaan, Tombol Bookmark
+          // 1. BARIS ATAS: Logo, Judul Pekerjaan, Tombol Delete
           Row(
             children: [
               // Judul & Perusahaan
@@ -38,17 +40,55 @@ class TJobCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(jobModel.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    Text(jobModel.companyName, style: TextStyle(color: Colors.grey, fontSize: 14)),
+                    Text(jobModel.title,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(jobModel.companyName,
+                        style: TextStyle(color: Colors.grey, fontSize: 14)),
                   ],
                 ),
               ),
 
-              // Tombol Bookmark (Bendera)
-              Icon(Iconsax.save_2, color: CColors.primary), // Ganti dengan CColors.primary
+              // Tombol Delete
+              PopupMenuButton(
+                itemBuilder: (BuildContext context) => [
+                  PopupMenuItem(
+                    child: const Text('Hapus'),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Hapus Lowongan'),
+                          content: const Text(
+                              'Apa Anda yakin ingin menghapus lowongan ini?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Batal'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                final controller =
+                                    Get.find<HrdJobListController>();
+                                controller.deleteJob(jobModel.id ?? 0);
+                              },
+                              child: const Text(
+                                'Hapus',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+                child: const Icon(Icons.more_vert),
+              ),
             ],
           ),
-          
+
           const SizedBox(height: 12),
 
           // 2. BARIS BAWAH: Lokasi & Gaji
@@ -56,10 +96,12 @@ class TJobCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Lokasi/Tipe Kerja
-              Text(jobModel.location, style: TextStyle(color: Colors.grey)), 
+              Text(jobModel.location, style: TextStyle(color: Colors.grey)),
 
               // Gaji
-              Text(jobModel.salary, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)), 
+              Text(jobModel.salary,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.green)),
             ],
           ),
         ],

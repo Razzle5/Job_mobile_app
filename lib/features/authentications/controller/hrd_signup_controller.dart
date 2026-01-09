@@ -72,7 +72,7 @@ class HrdSignupController extends GetxController {
       if (method == AuthMethod.google) {
         isLoading.value = false;
         final googleAuth = await _handleGoogleSignIn();
-        
+
         if (googleAuth == null) {
           Get.snackbar(
             'Info',
@@ -107,10 +107,10 @@ class HrdSignupController extends GetxController {
 
       if (result['success'] == true) {
         debugPrint('✅ Registration success!');
-        
+
         // 🔥 METODE 1: Navigasi langsung (paling sederhana)
         Get.back(); // Kembali ke halaman sebelumnya (login)
-        
+
         // Tampilkan snackbar setelah navigasi
         Future.delayed(const Duration(milliseconds: 300), () {
           Get.snackbar(

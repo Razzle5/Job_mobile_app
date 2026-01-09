@@ -1,15 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart'; 
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthRepository {
-  static const String _baseUrl = 'http://192.168.18.12:8080/api';
+  static const String _baseUrl = 'http://10.64.81.44:8080/api';
 
   // ============================================================
   // EXISTING METHODS (Jangan dihapus, ini sudah ada)
   // ============================================================
-  
-  Future<Map<String, dynamic>> registerHrd(String email, String password) async {
+
+  Future<Map<String, dynamic>> registerHrd(
+      String email, String password) async {
     final url = Uri.parse('$_baseUrl/hrd/register');
     print('AuthRepository.registerHrd -> POST $url');
     print('Payload: {"email": "$email", "password": "***"}');
@@ -20,6 +21,7 @@ class AuthRepository {
             url,
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
+              'Accept': 'application/json',
             },
             body: jsonEncode(<String, String>{
               'email': email,
@@ -51,13 +53,14 @@ class AuthRepository {
   Future<Map<String, dynamic>> loginGoogle(String idToken) async {
     final url = Uri.parse('$_baseUrl/hrd/google-login');
     print('AuthRepository.loginGoogle -> POST $url');
-    
+
     try {
       final response = await http
           .post(
             url,
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
+              'Accept': 'application/json',
             },
             body: jsonEncode(<String, String>{
               'id_token': idToken,
@@ -84,13 +87,14 @@ class AuthRepository {
     final url = Uri.parse('$_baseUrl/hrd/login');
     print('AuthRepository.loginHrd -> POST $url');
     print('Payload: {"email": "$email", "password": "***"}');
-    
+
     try {
       final response = await http
           .post(
             url,
             headers: <String, String>{
               'Content-Type': 'application/json; charset=UTF-8',
+              'Accept': 'application/json',
             },
             body: jsonEncode(<String, String>{
               'email': email,
@@ -183,6 +187,71 @@ class AuthRepository {
     } catch (e) {
       print('Error getting user data: $e');
       return null;
+    }
+  }
+
+  /// Ambil profile HRD (user + company) dari API
+  Future<Map<String, dynamic>> getHrdProfile() async {
+    final url = Uri.parse('$_baseUrl/hrd/profile');
+    try {
+      final token = await getToken();
+      if (token == null || token.isEmpty) {
+        return {'success': false, 'message': 'Token tidak ditemukan'};
+      }
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      );
+
+      final body = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': body['data']};
+      } else {
+        return {
+          'success': false,
+          'message': body['message'] ?? 'Gagal memuat profile'
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
+  /// Update atau create company profile untuk HRD
+  Future<Map<String, dynamic>> updateHrdProfile(
+      Map<String, dynamic> payload) async {
+    final url = Uri.parse('$_baseUrl/hrd/profile');
+    try {
+      final token = await getToken();
+      if (token == null || token.isEmpty) {
+        return {'success': false, 'message': 'Token tidak ditemukan'};
+      }
+
+      final response = await http.put(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode(payload),
+      );
+
+      final body = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': body['data']};
+      } else {
+        return {
+          'success': false,
+          'message': body['message'] ?? 'Gagal menyimpan profile'
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Network error: $e'};
     }
   }
 

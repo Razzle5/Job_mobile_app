@@ -1,10 +1,10 @@
-// FILE: features/authentications/controllers/hrd_login_controller.dart
+// FILE: features/authentications/controller/hrd_login_controller.dart
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:job_app/data/repositories/auth_repository_hrd.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:job_app/features/hrd_dashboard/screen/hrd_home_screen.dart';
+import 'package:job_app/features/hrd_dashboard/screen/hrd_navbar.dart';
 
 class HrdLoginController extends GetxController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -64,9 +64,9 @@ class HrdLoginController extends GetxController {
 
       if (result['success'] == true) {
         // 🔥 SIMPAN TOKEN (INI YANG BARU!)
-        final token = result['data']['token'];
+        final token = result['data']['data']['token'];
         await _repository.saveToken(token);
-        
+
         debugPrint('Token saved: ${token.substring(0, 20)}...');
 
         // 🔥 SIMPAN USER DATA (opsional, jika backend return user info)
@@ -75,8 +75,8 @@ class HrdLoginController extends GetxController {
           debugPrint('User data saved');
         }
 
-        // Navigate ke home
-        Get.offAllNamed(HrdHomeScreen.id);
+        // Navigate ke navbar (dengan home screen)
+        Get.offAllNamed(NavigationMenu.id);
 
         // Snackbar setelah navigasi
         Future.delayed(const Duration(milliseconds: 300), () {
@@ -107,7 +107,7 @@ class HrdLoginController extends GetxController {
       );
     }
   }
- 
+
   // ================= LOGIN GOOGLE =================
 
   Future<void> loginGoogle() async {
@@ -119,14 +119,14 @@ class HrdLoginController extends GetxController {
   }
 
   // ================= LOGOUT =================
-  
+
   Future<void> logout() async {
     try {
       await _repository.logout();
       debugPrint('Logged out successfully');
-      
+
       Get.offAllNamed('/login'); // Kembali ke login screen
-      
+
       Get.snackbar(
         'Sukses',
         'Logout berhasil',
