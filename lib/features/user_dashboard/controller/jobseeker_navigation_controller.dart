@@ -9,6 +9,6 @@ class JobSeekerNavigationController extends GetxController {
   final screens = const [
     JobSeekerHomeScreen(),
     JobSeekerActivityScreen(),
-    JobSeekerProfileScreen(),
+    JobseekerProfileScreen(),
   ];
 }

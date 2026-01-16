@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthRepository {
-  static const String _baseUrl = 'http://10.64.81.44:8080/api';
+  static const String _baseUrl = 'http://192.168.18.12:8080/api';
 
   // ============================================================
   // EXISTING METHODS (Jangan dihapus, ini sudah ada)

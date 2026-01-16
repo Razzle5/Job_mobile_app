@@ -26,8 +26,8 @@ class JobRepository {
       // 🔥 CHECK IF RESPONSE IS HTML (error page)
       if (response.body.contains('<!DOCTYPE') ||
           response.body.contains('<html')) {
-        print('❌ ERROR: Backend returned HTML instead of JSON!');
-        print('📍 Full response body:\n${response.body}');
+        print(' ERROR: Backend returned HTML instead of JSON!');
+        print(' Full response body:\n${response.body}');
         return [];
       }
 

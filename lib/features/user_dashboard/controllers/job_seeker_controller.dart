@@ -18,7 +18,7 @@ class JobSeekerController extends GetxController {
     try {
       isLoading.value = true;
 
-      final uri = Uri.parse('http://10.64.81.44:8080/api/job-seeker');
+      final uri = Uri.parse('http://192.168.18.12:8080/api/job-seeker');
       final request = http.MultipartRequest('POST', uri);
 
       request.fields.addAll(data);
@@ -55,7 +55,7 @@ class JobSeekerController extends GetxController {
       isLoading.value = true;
 
       final response = await http.get(
-        Uri.parse('http://10.64.81.44:8080/api/job-seeker/profile'),
+        Uri.parse('http://192.168.18.12:8080/api/job-seeker/profile'),
         headers: {
           'Authorization': 'Bearer YOUR_TOKEN',
         },
