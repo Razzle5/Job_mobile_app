@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 class JobSeekerController extends GetxController {
   final isLoading = false.obs;
 
-  // 🔥 INI YANG KURANG
+  //  INI YANG KURANG
   final RxMap<String, dynamic> jobSeeker = <String, dynamic>{}.obs;
 
   /// ================= SUBMIT DATA =================

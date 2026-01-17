@@ -14,16 +14,16 @@ class JobRepository {
   Future<List<JobModel>> fetchJobs() async {
     final url = Uri.parse('${ApiConstants.tBaseUrl}/api/jobs');
 
-    print('🔥 fetchJobs() -> GET $url');
+    print(' fetchJobs() -> GET $url');
 
     try {
       final response = await http.get(url).timeout(const Duration(seconds: 20));
 
-      print('✅ fetchJobs response: ${response.statusCode}');
+      print(' fetchJobs response: ${response.statusCode}');
       print(
-          '📄 Response body (first 500 chars): ${response.body.substring(0, response.body.length > 500 ? 500 : response.body.length)}');
+          ' Response body (first 500 chars): ${response.body.substring(0, response.body.length > 500 ? 500 : response.body.length)}');
 
-      // 🔥 CHECK IF RESPONSE IS HTML (error page)
+      //  CHECK IF RESPONSE IS HTML (error page)
       if (response.body.contains('<!DOCTYPE') ||
           response.body.contains('<html')) {
         print(' ERROR: Backend returned HTML instead of JSON!');

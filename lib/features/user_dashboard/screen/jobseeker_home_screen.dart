@@ -28,7 +28,7 @@ class _JobSeekerHomeScreenState extends State<JobSeekerHomeScreen> {
         print('   - ${job.title} (${job.companyName})');
       }
     }).catchError((error) {
-      print('❌ Error loading jobs: $error');
+      print(' Error loading jobs: $error');
     });
     super.initState();
   }
