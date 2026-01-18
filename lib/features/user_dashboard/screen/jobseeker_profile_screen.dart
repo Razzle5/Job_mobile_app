@@ -9,6 +9,10 @@ import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import 'package:job_app/data/repositories/auth_repository_jobseeker.dart';
 import 'package:job_app/features/authentications/screen/welcome_screen.dart';
+import 'package:job_app/constants/api_constants.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 
 class CustomColors {
   static const Color darkAccent = Color(0xFF1976D2);
@@ -72,51 +76,44 @@ class _JobseekerProfileScreenState extends State<JobseekerProfileScreen> {
     super.dispose();
   }
 
-  Future<void> _loadProfile() async {
-    setState(() => _loading = true);
+Future<void> _loadProfile() async {
+  setState(() => _loading = true);
 
-    try {
-      // TODO: Ganti dengan API call ke backend
-      // final result = await JobseekerRepository().getProfile();
-      
-      // Sementara ambil dari SharedPreferences
-      final userData = await _authRepo.getUserData();
-      
-      // Simulasi: Cek apakah user sudah punya profile lengkap
-      // Kalau email dari SharedPreferences ada, berarti sudah register
-      if (userData['email'] != null && userData['email']!.isNotEmpty) {
-        // TODO: Load dari API, untuk sekarang pakai dummy data
-        _firstNameController.text = 'John';
-        _lastNameController.text = 'Doe';
-        _emailController.text = userData['email']!;
-        _phoneController.text = '081234567890';
-        _dobController.text = '1995-05-15';
-        _selectedDate = DateTime.parse('1995-05-15');
-        _domicileController.text = 'Jakarta';
-        _addressController.text = 'Jl. Sudirman No. 123, Jakarta Pusat';
-        _selectedEducation = 'Sarjana (S1)';
-        
-        setState(() {
-          _hasProfile = true;
-          _isEditing = false;
-        });
-      } else {
-        // Belum ada profile, langsung mode edit
-        setState(() {
-          _hasProfile = false;
-          _isEditing = true;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error loading profile: $e');
+  try {
+    final response = await http.get(
+      Uri.parse('${ApiConstants.tBaseUrl}/api/job-seeker/profile'),
+      headers: {'Authorization': 'Bearer ${await _authRepo.getToken()}'},
+    );
+
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+      final profile = body['profile'];
+
+      _firstNameController.text = profile['first_name'] ?? '';
+      _lastNameController.text = profile['last_name'] ?? '';
+      _emailController.text = profile['email'] ?? '';
+      _phoneController.text = profile['phone'] ?? '';
+      _dobController.text = profile['dob'] ?? '';
+      _domicileController.text = profile['domicile'] ?? '';
+      _addressController.text = profile['address'] ?? '';
+      _selectedEducation = profile['education'];
+
       setState(() {
-        _hasProfile = false;
-        _isEditing = true;
+        _hasProfile = true;
+        _isEditing = false;
       });
-    } finally {
-      setState(() => _loading = false);
     }
+  } catch (e) {
+    debugPrint('Error loading profile: $e');
+    setState(() {
+      _hasProfile = false;
+      _isEditing = true;
+    });
+  } finally {
+    setState(() => _loading = false);
   }
+}
+
 
   Future<void> _pickDate() async {
     FocusScope.of(context).unfocus();
@@ -166,80 +163,101 @@ class _JobseekerProfileScreenState extends State<JobseekerProfileScreen> {
     }
   }
 
-  Future<void> _saveProfile() async {
-    if (!_formKey.currentState!.validate()) return;
-    
-    if (_selectedEducation == null) {
-      Get.snackbar(
-        'Gagal',
-        'Pilih pendidikan terakhir',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      return;
-    }
-    
-    if (!_hasProfile && _cvFile == null) {
-      Get.snackbar(
-        'Gagal',
-        'Upload CV/Resume terlebih dahulu',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      return;
+Future<void> _saveProfile() async {
+  if (!_formKey.currentState!.validate()) return;
+  
+  if (_selectedEducation == null) {
+    Get.snackbar(
+      'Gagal',
+      'Pilih pendidikan terakhir',
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
+    return;
+  }
+  
+  if (!_hasProfile && _cvFile == null) {
+    Get.snackbar(
+      'Gagal',
+      'Upload CV/Resume terlebih dahulu',
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
+    return;
+  }
+
+  setState(() => _loading = true);
+
+  try {
+    // Data profil
+    final profileData = {
+      'first_name': _firstNameController.text.trim(),
+      'last_name': _lastNameController.text.trim(),
+      'birth_date': _dobController.text,
+      'phone_number': _phoneController.text.trim(),
+      'email': _emailController.text.trim(),
+      'domicile': _domicileController.text.trim(),
+      'full_address': _addressController.text.trim(),
+      'current_education': _selectedEducation!,
+    };
+
+    debugPrint('Profile Data: $profileData');
+    debugPrint('CV File: ${_cvFile?.name}');
+
+    // Kirim ke backend API (pakai multipart request karena ada file)
+    final uri = Uri.parse('${ApiConstants.tBaseUrl}/api/job-seeker/profile');
+    final request = http.MultipartRequest(
+      _hasProfile ? 'PUT' : 'POST',
+      uri,
+    );
+
+    // Tambahkan header auth kalau perlu
+    final token = await _authRepo.getToken();
+    if (token != null) {
+      request.headers['Authorization'] = 'Bearer $token';
     }
 
-    setState(() => _loading = true);
+    // Tambahkan field
+    request.fields.addAll(profileData);
 
-    try {
-      // TODO: Kirim ke backend API
-      final profileData = {
-        'first_name': _firstNameController.text.trim(),
-        'last_name': _lastNameController.text.trim(),
-        'email': _emailController.text.trim(),
-        'phone': _phoneController.text.trim(),
-        'dob': _dobController.text,
-        'domicile': _domicileController.text.trim(),
-        'address': _addressController.text.trim(),
-        'education': _selectedEducation!,
-      };
-      
-      debugPrint('Profile Data: $profileData');
-      debugPrint('CV File: ${_cvFile?.name}');
-      
-      // Simulasi API call
-      await Future.delayed(const Duration(seconds: 1));
-      
-      // TODO: Uncomment ini nanti kalau API sudah ready
-      // final result = await JobseekerRepository().submitProfile(
-      //   data: JobseekerModel.fromJson(profileData),
-      //   cvFilePath: _cvFile!.path!,
-      // );
-      
+    // Tambahkan file CV kalau ada
+    if (_cvFile != null) {
+      request.files.add(await http.MultipartFile.fromPath('cv', _cvFile!.path!));
+    }
+
+    final response = await request.send();
+    final respStr = await response.stream.bytesToString();
+    debugPrint('Response: $respStr');
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
       setState(() {
         _hasProfile = true;
         _isEditing = false;
         _loading = false;
       });
-      
+
       Get.snackbar(
         'Sukses',
         'Profil berhasil disimpan',
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
-    } catch (e) {
-      debugPrint('Error saving profile: $e');
-      setState(() => _loading = false);
-      
-      Get.snackbar(
-        'Error',
-        'Gagal menyimpan profil',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+    } else {
+      throw Exception('Failed to save profile: $respStr');
     }
+  } catch (e) {
+    debugPrint('Error saving profile: $e');
+    setState(() => _loading = false);
+
+    Get.snackbar(
+      'Error',
+      'Gagal menyimpan profil',
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
   }
+}
+
 
   Future<void> _logout() async {
     final confirm = await Get.dialog<bool>(
@@ -794,6 +812,8 @@ class _JobseekerProfileScreenState extends State<JobseekerProfileScreen> {
   }
 
   String _formatDate(String dateString) {
+    if (dateString.isEmpty) return 'Tanggal tidak tersedia';
+
     try {
       final date = DateTime.parse(dateString);
       final months = [
@@ -802,7 +822,9 @@ class _JobseekerProfileScreenState extends State<JobseekerProfileScreen> {
       ];
       return '${date.day} ${months[date.month - 1]} ${date.year}';
     } catch (e) {
-      return dateString;
+      debugPrint('Format date error: $e');
+      return dateString; // fallback ke string asli
     }
   }
+
 }

@@ -21,23 +21,40 @@ class JobModel {
     required this.companyLogo,
   });
 
+  /// Factory untuk parsing JSON dari API Laravel
   factory JobModel.fromJson(Map<String, dynamic> json) {
+    // Ambil relasi company kalau ada
     final companyData = json['company'] as Map<String, dynamic>?;
 
     return JobModel(
       id: _parseInt(json['id']),
       companyId: _parseInt(json['company_id']),
-      title: json['title'].toString(),
-      description: json['description'].toString(),
-      location: json['location'].toString(),
-      salary: json['salary'].toString(),
-      type: json['type'].toString(),
-      companyName: companyData?['brand_name']?.toString() ?? 'N/A',
-      companyLogo: 'Iconsax.facebook',
+      title: json['title']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      location: json['location']?.toString() ?? '',
+      salary: json['salary']?.toString() ?? '',
+      type: json['type']?.toString() ?? '',
+      companyName: companyData?['brand_name']?.toString() ?? '',
+      companyLogo: companyData?['logo']?.toString() ?? '',
     );
   }
 
-  // Helper method to safely parse int
+  /// Convert ke JSON (misalnya untuk create/update job)
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'company_id': companyId,
+      'title': title,
+      'description': description,
+      'location': location,
+      'salary': salary,
+      'type': type,
+      'company_name': companyName,
+      'company_logo': companyLogo,
+    };
+  }
+
+  // Helper method untuk parsing int dengan aman
   static int _parseInt(dynamic value) {
     if (value == null) return 0;
     if (value is int) return value;

@@ -17,7 +17,7 @@ class JobRepository {
     print(' fetchJobs() -> GET $url');
 
     try {
-      final response = await http.get(url).timeout(const Duration(seconds: 20));
+      final response = await http.get(url).timeout(const Duration(seconds: 60));
 
       print(' fetchJobs response: ${response.statusCode}');
       print(
@@ -52,9 +52,9 @@ class JobRepository {
               print('🔍 Parsing job $i: $jobJson');
               final job = JobModel.fromJson(jobJson);
               jobs.add(job);
-              print('✅ Job $i parsed successfully: ${job.title}');
+              print(' Job $i parsed successfully: ${job.title}');
             } catch (e) {
-              print('❌ Error parsing job $i: $e');
+              print('Error parsing job $i: $e');
               print('   Job data: ${jobListJson[i]}');
             }
           }
@@ -107,7 +107,7 @@ class JobRepository {
 
   /// Get jobs by company (HRD hanya lihat lowongan milik company-nya)
   Future<List<JobModel>> getJobsByCompany(String token) async {
-    final url = Uri.parse('${ApiConstants.tBaseUrl}/api/hrd/jobs');
+    final url = Uri.parse('${ApiConstants.tBaseUrl}/api/jobs');
 
     try {
       final response = await http.get(
