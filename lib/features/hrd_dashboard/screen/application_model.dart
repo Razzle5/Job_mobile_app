@@ -3,24 +3,20 @@ class ApplicationModel {
   final String jobTitle;
   final String jobSeekerName;
   final String status;
-  final String? cvUrl;
 
   ApplicationModel({
     required this.id,
     required this.jobTitle,
     required this.jobSeekerName,
     required this.status,
-    this.cvUrl
   });
 
   factory ApplicationModel.fromJson(Map<String, dynamic> json) {
     return ApplicationModel(
       id: json['id'],
-      jobTitle: json['job_title'] ?? 'Tanpa Judul',
-      jobSeekerName: json['job_seeker_name'] ?? 'Tanpa Nama',
+      jobTitle: json['job']['title'] ?? 'Tanpa Judul',
+      jobSeekerName: json['job_seeker']['first_name'] ?? 'Tanpa Nama',
       status: json['status'] ?? 'pending',
-      cvUrl: json['cv_url'],
     );
   }
-
 }

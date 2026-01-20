@@ -13,7 +13,6 @@ import 'package:job_app/constants/api_constants.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-
 class CustomColors {
   static const Color darkAccent = Color(0xFF1976D2);
   static const Color lightAccent = Color(0xFF64B5F6);
@@ -21,7 +20,7 @@ class CustomColors {
 
 class JobseekerProfileScreen extends StatefulWidget {
   const JobseekerProfileScreen({super.key});
-  static const String id = '/jobseeker_profile';
+  static const String id = '/job-seeker_profile';
 
   @override
   State<JobseekerProfileScreen> createState() => _JobseekerProfileScreenState();
@@ -30,7 +29,7 @@ class JobseekerProfileScreen extends StatefulWidget {
 class _JobseekerProfileScreenState extends State<JobseekerProfileScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final AuthRepositoryJobSeeker _authRepo = AuthRepositoryJobSeeker();
-  
+
   // Text Controllers
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -39,7 +38,7 @@ class _JobseekerProfileScreenState extends State<JobseekerProfileScreen> {
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _domicileController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  
+
   // State
   bool _loading = true;
   bool _isEditing = false;
@@ -47,7 +46,7 @@ class _JobseekerProfileScreenState extends State<JobseekerProfileScreen> {
   DateTime? _selectedDate;
   String? _selectedEducation;
   PlatformFile? _cvFile;
-  
+
   final List<String> educationOptions = [
     'SD',
     'SMP',
@@ -76,55 +75,57 @@ class _JobseekerProfileScreenState extends State<JobseekerProfileScreen> {
     super.dispose();
   }
 
-Future<void> _loadProfile() async {
-  setState(() => _loading = true);
+  Future<void> _loadProfile() async {
+    setState(() => _loading = true);
 
-  try {
-    final response = await http.get(
-      Uri.parse('${ApiConstants.tBaseUrl}/api/job-seeker/profile'),
-      headers: {'Authorization': 'Bearer ${await _authRepo.getToken()}'},
-    );
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConstants.tBaseUrl}/api/job-seeker/profile'),
+         headers: { 'Authorization': 'Bearer ${await _authRepo.getToken()}',
+        'Accept': 'application/json', 
+        'Content-Type': 'application/json', 
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final body = jsonDecode(response.body);
-      final profile = body['profile'];
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        final profile = body['data'];
 
-      _firstNameController.text = profile['first_name'] ?? '';
-      _lastNameController.text = profile['last_name'] ?? '';
-      _emailController.text = profile['email'] ?? '';
-      _phoneController.text = profile['phone'] ?? '';
-      _dobController.text = profile['dob'] ?? '';
-      _domicileController.text = profile['domicile'] ?? '';
-      _addressController.text = profile['address'] ?? '';
-      _selectedEducation = profile['education'];
+        _firstNameController.text = profile['first_name'] ?? '';
+        _lastNameController.text = profile['last_name'] ?? '';
+        _emailController.text = profile['email'] ?? '';
+        _phoneController.text = profile['phone_number'] ?? '';
+        _dobController.text = profile['birth_date'] ?? '';
+        _domicileController.text = profile['domicile'] ?? '';
+        _addressController.text = profile['full_address'] ?? '';
+        _selectedEducation = profile['current_education'];
 
+        setState(() {
+          _hasProfile = false;
+          _isEditing = true;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading profile: $e');
       setState(() {
-        _hasProfile = true;
+        _hasProfile = false;
         _isEditing = false;
       });
+    } finally {
+      setState(() => _loading = false);
     }
-  } catch (e) {
-    debugPrint('Error loading profile: $e');
-    setState(() {
-      _hasProfile = false;
-      _isEditing = true;
-    });
-  } finally {
-    setState(() => _loading = false);
   }
-}
-
 
   Future<void> _pickDate() async {
     FocusScope.of(context).unfocus();
-    
+
     final date = await showDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime(2000, 1, 1),
       firstDate: DateTime(1950),
       lastDate: DateTime.now().subtract(const Duration(days: 18 * 365)),
     );
-    
+
     if (date != null) {
       setState(() {
         _selectedDate = date;
@@ -144,7 +145,7 @@ Future<void> _loadProfile() async {
         setState(() {
           _cvFile = result.files.first;
         });
-        
+
         Get.snackbar(
           'File Dipilih',
           'CV: ${_cvFile!.name}',
@@ -163,101 +164,108 @@ Future<void> _loadProfile() async {
     }
   }
 
-Future<void> _saveProfile() async {
-  if (!_formKey.currentState!.validate()) return;
-  
-  if (_selectedEducation == null) {
-    Get.snackbar(
-      'Gagal',
-      'Pilih pendidikan terakhir',
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
-    return;
-  }
-  
-  if (!_hasProfile && _cvFile == null) {
-    Get.snackbar(
-      'Gagal',
-      'Upload CV/Resume terlebih dahulu',
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
-    return;
-  }
+  Future<void> _saveProfile() async {
+    if (!_formKey.currentState!.validate()) return;
 
-  setState(() => _loading = true);
-
-  try {
-    // Data profil
-    final profileData = {
-      'first_name': _firstNameController.text.trim(),
-      'last_name': _lastNameController.text.trim(),
-      'birth_date': _dobController.text,
-      'phone_number': _phoneController.text.trim(),
-      'email': _emailController.text.trim(),
-      'domicile': _domicileController.text.trim(),
-      'full_address': _addressController.text.trim(),
-      'current_education': _selectedEducation!,
-    };
-
-    debugPrint('Profile Data: $profileData');
-    debugPrint('CV File: ${_cvFile?.name}');
-
-    // Kirim ke backend API (pakai multipart request karena ada file)
-    final uri = Uri.parse('${ApiConstants.tBaseUrl}/api/job-seeker/profile');
-    final request = http.MultipartRequest(
-      _hasProfile ? 'PUT' : 'POST',
-      uri,
-    );
-
-    // Tambahkan header auth kalau perlu
-    final token = await _authRepo.getToken();
-    if (token != null) {
-      request.headers['Authorization'] = 'Bearer $token';
-    }
-
-    // Tambahkan field
-    request.fields.addAll(profileData);
-
-    // Tambahkan file CV kalau ada
-    if (_cvFile != null) {
-      request.files.add(await http.MultipartFile.fromPath('cv', _cvFile!.path!));
-    }
-
-    final response = await request.send();
-    final respStr = await response.stream.bytesToString();
-    debugPrint('Response: $respStr');
-
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      setState(() {
-        _hasProfile = true;
-        _isEditing = false;
-        _loading = false;
-      });
-
+    if (_selectedEducation == null) {
       Get.snackbar(
-        'Sukses',
-        'Profil berhasil disimpan',
-        backgroundColor: Colors.green,
+        'Gagal',
+        'Pilih pendidikan terakhir',
+        backgroundColor: Colors.red,
         colorText: Colors.white,
       );
-    } else {
-      throw Exception('Failed to save profile: $respStr');
+      return;
     }
-  } catch (e) {
-    debugPrint('Error saving profile: $e');
-    setState(() => _loading = false);
 
-    Get.snackbar(
-      'Error',
-      'Gagal menyimpan profil',
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
+    if (!_hasProfile && _cvFile == null) {
+      Get.snackbar(
+        'Gagal',
+        'Upload CV/Resume terlebih dahulu',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    try {
+      // Data profil
+      final profileData = {
+        'first_name': _firstNameController.text.trim(),
+        'last_name': _lastNameController.text.trim(),
+        'birth_date': _dobController.text,
+        'phone_number': _phoneController.text.trim(),
+        'email': _emailController.text.trim(),
+        'domicile': _domicileController.text.trim(),
+        'full_address': _addressController.text.trim(),
+        'current_education': _selectedEducation!,
+      };
+
+      debugPrint('Profile Data: $profileData');
+      debugPrint('CV File: ${_cvFile?.name}');
+
+      // Kirim ke backend API (pakai multipart request karena ada file)
+    final uri = Uri.parse('${ApiConstants.tBaseUrl}/api/job-seeker/profile');
+
+
+
+
+      final request = http.MultipartRequest(
+        _hasProfile ? 'PUT' : 'POST',
+        uri,
+      );
+
+
+      // Tambahkan header auth kalau perlu
+      final token = await _authRepo.getToken();
+      if (token != null) {
+        request.headers['Authorization'] = 'Bearer $token';
+      }
+
+      // Tambahkan field
+      request.fields.addAll(profileData);
+
+      // Tambahkan file CV kalau ada
+      if (_cvFile != null) {
+        request.files
+            .add(await http.MultipartFile.fromPath('cv', _cvFile!.path!));
+      }
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      debugPrint('Response: $respStr');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        setState(() {
+          _hasProfile = true;
+          _isEditing = false;
+          _loading = false;
+        });
+
+        Get.snackbar(
+          'Sukses',
+          'Profil berhasil disimpan',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        debugPrint('Status Code: ${response.statusCode}'); 
+        debugPrint('Response Body: $respStr');
+        throw Exception('Failed to save profile: $respStr');
+      }
+    } catch (e) {
+      debugPrint('Error saving profile: $e');
+      setState(() => _loading = false);
+
+      Get.snackbar(
+        'Error',
+        'Gagal menyimpan profil',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
-}
-
 
   Future<void> _logout() async {
     final confirm = await Get.dialog<bool>(
@@ -293,9 +301,9 @@ Future<void> _saveProfile() async {
 
     try {
       await _authRepo.logout();
-      
+
       Get.offAllNamed(WelcomeScreen.id);
-      
+
       Get.snackbar(
         'Logout',
         'Berhasil logout',
@@ -322,7 +330,7 @@ Future<void> _saveProfile() async {
         backgroundColor: CustomColors.darkAccent,
         elevation: 0,
         actions: [
-          if (_hasProfile && !_isEditing)
+          if (!_isEditing)
             IconButton(
               icon: const Icon(Icons.edit, color: Colors.white),
               onPressed: () {
@@ -367,16 +375,17 @@ Future<void> _saveProfile() async {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // First Name
             _buildTextField(
               controller: _firstNameController,
               icon: Ionicons.person_outline,
               hintText: 'Nama Depan',
-              validator: (value) => (value == null || value.isEmpty) ? 'Wajib diisi' : null,
+              validator: (value) =>
+                  (value == null || value.isEmpty) ? 'Wajib diisi' : null,
             ),
             const SizedBox(height: 16),
-            
+
             // Last Name
             _buildTextField(
               controller: _lastNameController,
@@ -384,27 +393,31 @@ Future<void> _saveProfile() async {
               hintText: 'Nama Belakang',
             ),
             const SizedBox(height: 16),
-            
+
             // Email
             _buildTextField(
               controller: _emailController,
               icon: Ionicons.mail_outline,
               hintText: 'Email',
               keyboardType: TextInputType.emailAddress,
-              validator: (value) => (value == null || !value.contains('@')) ? 'Email tidak valid' : null,
+              validator: (value) => (value == null || !value.contains('@'))
+                  ? 'Email tidak valid'
+                  : null,
             ),
             const SizedBox(height: 16),
-            
+
             // Phone
             _buildTextField(
               controller: _phoneController,
               icon: Ionicons.phone_portrait_outline,
               hintText: 'Nomor Telepon',
               keyboardType: TextInputType.phone,
-              validator: (value) => (value == null || value.length < 10) ? 'Nomor tidak valid' : null,
+              validator: (value) => (value == null || value.length < 10)
+                  ? 'Nomor tidak valid'
+                  : null,
             ),
             const SizedBox(height: 16),
-            
+
             // Date of Birth
             Row(
               children: [
@@ -414,36 +427,40 @@ Future<void> _saveProfile() async {
                     icon: Ionicons.calendar_outline,
                     hintText: 'Tanggal Lahir',
                     readOnly: true,
-                    validator: (value) => (value == null || value.isEmpty) ? 'Wajib diisi' : null,
+                    validator: (value) =>
+                        (value == null || value.isEmpty) ? 'Wajib diisi' : null,
                   ),
                 ),
                 IconButton(
                   onPressed: _pickDate,
-                  icon: Icon(Ionicons.calendar, color: CustomColors.lightAccent),
+                  icon:
+                      Icon(Ionicons.calendar, color: CustomColors.lightAccent),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Domicile
             _buildTextField(
               controller: _domicileController,
               icon: Ionicons.home_outline,
               hintText: 'Domisili (Kota)',
-              validator: (value) => (value == null || value.isEmpty) ? 'Wajib diisi' : null,
+              validator: (value) =>
+                  (value == null || value.isEmpty) ? 'Wajib diisi' : null,
             ),
             const SizedBox(height: 16),
-            
+
             // Address
             _buildTextField(
               controller: _addressController,
               icon: Ionicons.location_outline,
               hintText: 'Alamat Lengkap',
               maxLines: 3,
-              validator: (value) => (value == null || value.isEmpty) ? 'Wajib diisi' : null,
+              validator: (value) =>
+                  (value == null || value.isEmpty) ? 'Wajib diisi' : null,
             ),
             const SizedBox(height: 16),
-            
+
             // Education Dropdown
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -482,7 +499,7 @@ Future<void> _saveProfile() async {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Upload CV
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -497,7 +514,8 @@ Future<void> _saveProfile() async {
                 const SizedBox(width: 16),
                 ElevatedButton.icon(
                   onPressed: _pickCV,
-                  icon: Icon(_cvFile == null ? Icons.upload : Icons.check_circle),
+                  icon:
+                      Icon(_cvFile == null ? Icons.upload : Icons.check_circle),
                   label: Text(
                     _cvFile == null ? 'UPLOAD' : _cvFile!.name,
                     style: GoogleFonts.nunitoSans(
@@ -506,13 +524,15 @@ Future<void> _saveProfile() async {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _cvFile == null ? CustomColors.darkAccent : Colors.green,
+                    backgroundColor: _cvFile == null
+                        ? CustomColors.darkAccent
+                        : Colors.green,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 32),
-            
+
             // Action Buttons
             Row(
               children: [
@@ -609,7 +629,8 @@ Future<void> _saveProfile() async {
                 ),
                 const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
@@ -648,7 +669,8 @@ Future<void> _saveProfile() async {
                 ),
                 const SizedBox(height: 24),
 
-                _buildSectionTitle('Informasi Pribadi', Ionicons.person_outline),
+                _buildSectionTitle(
+                    'Informasi Pribadi', Ionicons.person_outline),
                 const SizedBox(height: 12),
                 _buildInfoCard(
                   icon: Ionicons.calendar_outline,
@@ -697,7 +719,7 @@ Future<void> _saveProfile() async {
   }
 
   // ==================== HELPER WIDGETS ====================
-  
+
   Widget _buildTextField({
     required TextEditingController controller,
     required IconData icon,
@@ -817,8 +839,18 @@ Future<void> _saveProfile() async {
     try {
       final date = DateTime.parse(dateString);
       final months = [
-        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember'
       ];
       return '${date.day} ${months[date.month - 1]} ${date.year}';
     } catch (e) {
@@ -826,5 +858,4 @@ Future<void> _saveProfile() async {
       return dateString; // fallback ke string asli
     }
   }
-
 }

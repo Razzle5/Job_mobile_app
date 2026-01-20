@@ -5,6 +5,8 @@ import 'package:job_app/common/styles/widget/custom_shapes/container/primary_hea
 import 'package:job_app/common/styles/widget/job__card.dart';
 import 'package:job_app/data/models/job_model.dart';
 import 'package:job_app/data/repositories/job_repository.dart';
+import 'package:job_app/data/repositories/job_application_repository.dart';
+import 'package:job_app/features/user_dashboard/screen/job_detail_page.dart';
 
 class JobSeekerHomeScreen extends StatefulWidget {
   const JobSeekerHomeScreen({super.key});
@@ -107,7 +109,12 @@ class _JobSeekerHomeScreenState extends State<JobSeekerHomeScreen> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
                               final job = jobs[index];
-                              return TJobCard(jobModel: job);
+                              return InkWell(
+                                onTap: () {
+                                  Get.to(() => JobDetailPage(job: job));
+                                },
+                                child: TJobCard(jobModel: job),
+                              );
                             },
                           ),
                         );
